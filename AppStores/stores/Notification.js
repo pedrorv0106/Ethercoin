@@ -6,6 +6,7 @@ import NotificationDS from '../DataSource/NotificationDS'
 import API from '../../api'
 import Transaction from '../../AppStores/stores/Transaction'
 import TransactionBTC from '../../AppStores/stores/Transaction.btc'
+import DeviceInfo from 'react-native-device-info'
 
 class Notification {
     @observable currentNotif = null
@@ -26,10 +27,11 @@ class Notification {
     }
   
     addWallet(name, address, type) {
+      console.log('1111111111', this.deviceToken);
       if (!this.deviceToken) {
         return null
       }
-  
+      console.log('2222222222', name, address, this.deviceToken, type);
       return API.addWallet(name, address, this.deviceToken, type).then((res) => {
         const { data, success } = res.data
         if (success) {

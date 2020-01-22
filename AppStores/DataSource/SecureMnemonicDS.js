@@ -1,7 +1,5 @@
 import { AsyncStorage } from 'react-native'
-import Keystore from '../../Libs/react-native-golden-keystore'
 import { ethers } from 'ethers'
-import { encrypt, decrypt } from '../../Utils/DataCrypto'
 
 const dataKey = `secure-mnemonic`
 

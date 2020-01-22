@@ -1,5 +1,4 @@
 import { AsyncStorage } from 'react-native'
-import { encryptString, decryptString } from '../../Utils/DataCrypto'
 
 const dataKey = address => `${address}-privateKey`.toLowerCase()
 const trackDataKey = 'address-privatekey-added'
@@ -25,13 +24,12 @@ class SecurePrivateKeyDataSource {
   async getPrivateKey(address) {
     const privateKeyCipher = await AsyncStorage.getItem(dataKey(address))
     if (!privateKeyCipher) return null
-    return decryptString(privateKeyCipher, this.password, this.iv, 'aes-256-cbc')
+    return privateKeyCipher
   }
 
   savePrivateKey(address, privateKey) {
-    const cipher = encryptString(privateKey, this.password, this.iv, 'aes-256-cbc')
     this.updateTrackDataKey(address, false)
-    return AsyncStorage.setItem(dataKey(address), cipher)
+    return AsyncStorage.setItem(dataKey(address), privateKey)
   }
 
   deletePrivateKey(address) {

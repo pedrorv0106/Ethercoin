@@ -29,11 +29,11 @@ class CreateWalletStore {
             coinPath = Keystore.CoinType.BTC.path
             index = MainStore.appState.currentBTCWalletIndex
         }
-        console.log('aaaaaaaaaaaaaaaa', coinPath);
         const { title } = this;
         generateNew(ds, title, index, coinPath, coin).then(async (w) => {
             this.finished = true
             NotificationStore.addWallet(title, w.address, w.type === 'ethereum' ? 'ETH' : 'BTC')
+            console.log('aaaaaaaaaaaaaaaa', coinPath);
             MainStore.appState.appWalletsStore.addOne(w)
             MainStore.appState.autoSetSelectedWallet()
             if (coin === chainNames.ETH) {
@@ -44,8 +44,7 @@ class CreateWalletStore {
             MainStore.appState.save()
             MainStore.appState.selectedWallet.fetchingBalance()
             this.loading = false
-            },
-        ds)
+        }, ds)
     }
   
     @computed get title() {

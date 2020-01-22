@@ -3,14 +3,20 @@ import EthWallet from './Wallet'
 import Keystore from '../../../Libs/react-native-golden-keystore'
 import WalletDS from '../../DataSource/WalletDS'
 import GetAddress, { chainNames } from '../../../Utils/WalletAddresses'
+import { ethers } from 'ethers'
 
 export const generateNew = async (secureDS, title, index = 0, path = Keystore.CoinType.ETH.path, coin = chainNames.ETH, network = 'mainnet') => {
   if (!secureDS) throw new Error('Secure data source is required')
   const mnemonic = await secureDS.deriveMnemonic()
-  const { private_key } = await Keystore.createHDKeyPair(mnemonic, '', path, index)
+  // const { private_key } = await Keystore.createHDKeyPair(mnemonic, '', path, index)
+  const provider = ethers.getDefaultProvider('ropsten') //production ? 'mainnet' : 'ropsten'
+  provider.getBalance = provider.getBalance.bind(provider)
+  const wallet = ethers.Wallet.fromMnemonic(mnemonic).connect(provider)
+  const private_key = wallet.privateKey
+  
   const { address } = GetAddress(private_key, coin, network)
   secureDS.savePrivateKey(address, private_key)
-
+  
   if (coin === chainNames.ETH) {
     return new EthWallet({
       address, balance: '0', index, title, isFetchingBalance: true
