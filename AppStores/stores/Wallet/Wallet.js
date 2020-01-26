@@ -5,7 +5,6 @@ import WalletToken from '../WalletToken'
 import Keystore from '../../../Libs/react-native-golden-keystore'
 import WalletDS from '../../DataSource/WalletDS'
 import GetAddress, { chainNames } from '../../../Utils/WalletAddresses'
-import api from '../../../api'
 import MainStore from '../../MainStore'
 import Collectible from '../Collectible'
 // Object Wallet:
@@ -137,35 +136,35 @@ export default class Wallet {
     this.loading = true
     this.isRefresh = isRefresh
     this.isFetchingBalance = !isRefresh && !isBackground
-    try {
-      const res = await api.fetchWalletInfo(this.address)
+    // try {
+    //   const res = await api.fetchWalletInfo(this.address)
 
-      const { data } = res.data
-      const tokens = data.tokens ? data.tokens.map(t => new WalletToken(t, this.address)) : []
-      const tokenETH = this.getTokenETH(data)
-      this.autoSetSelectedTokenIfNeeded([tokenETH, ...tokens])
-      const totalTokenDollar = this.tokens.reduce((rs, item) => rs.plus(item.balanceInDollar), new BigNumber('0'))
-      const totalTokenETH = totalTokenDollar.dividedBy(MainStore.appState.rateETHDollar)
-      this.balance = new BigNumber(`${data.ETH.balance}`).times(new BigNumber('1e+18'))
-      this.totalBalance = totalTokenETH
-      this.update()
-      this.offLoading()
-    } catch (e) {
-      this.offLoading()
-    }
+    //   const { data } = res.data
+    //   const tokens = data.tokens ? data.tokens.map(t => new WalletToken(t, this.address)) : []
+    //   const tokenETH = this.getTokenETH(data)
+    //   this.autoSetSelectedTokenIfNeeded([tokenETH, ...tokens])
+    //   const totalTokenDollar = this.tokens.reduce((rs, item) => rs.plus(item.balanceInDollar), new BigNumber('0'))
+    //   const totalTokenETH = totalTokenDollar.dividedBy(MainStore.appState.rateETHDollar)
+    //   this.balance = new BigNumber(`${data.ETH.balance}`).times(new BigNumber('1e+18'))
+    //   this.totalBalance = totalTokenETH
+    //   this.update()
+    //   this.offLoading()
+    // } catch (e) {
+    //   this.offLoading()
+    // }
   }
 
   @action fetchCollectibles() {
     this.isFetchingCollectibles = this.collectibles.length === 0
-    api.fetchCollectibles(this.address).then((res) => {
-      this.isFetchingCollectibles = false
-      if (!res.data.assets) return
-      this.collectibles = res.data.assets
-        .filter(collectible => collectible.external_link !== null)
-        .map(collectible => new Collectible(collectible, this.address))
-    }).catch((e) => {
-      this.isFetchingCollectibles = false
-    })
+    // api.fetchCollectibles(this.address).then((res) => {
+    //   this.isFetchingCollectibles = false
+    //   if (!res.data.assets) return
+    //   this.collectibles = res.data.assets
+    //     .filter(collectible => collectible.external_link !== null)
+    //     .map(collectible => new Collectible(collectible, this.address))
+    // }).catch((e) => {
+    //   this.isFetchingCollectibles = false
+    // })
   }
 
   @action setTokens(tokens) {

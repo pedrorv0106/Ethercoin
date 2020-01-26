@@ -17,8 +17,9 @@ export default class AppWalletsStore {
       const index = walletMap[w.address]
       wallets[index] = w
     })
-
     this.wallets = wallets
+
+    return this.wallets;
   }
 
   @action save() {

@@ -27,8 +27,7 @@ export default class RecoveryStepTwoComponent extends Component {
       && passphraseInputValue4 === listKeywordRandom[3]) {
         
         const createWalletStore = new CreateWalletStore();
-        createWalletStore.setTitle('walletETH');
-        createWalletStore.handleCreateWallet(chainNames.ETH);
+        createWalletStore.handleCreateWallet();
 
         this.props.navigation.navigate('Main')
     } else {

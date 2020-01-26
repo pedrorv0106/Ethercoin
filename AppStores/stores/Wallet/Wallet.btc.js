@@ -2,10 +2,8 @@ import { observable, action, computed } from 'mobx'
 import BigNumber from 'bignumber.js'
 import Wallet from './Wallet'
 import Keystore from '../../../Libs/react-native-golden-keystore'
-import api from '../../../api'
 import MainStore from '../../MainStore'
 import WalletTokenBTC from '../WalletToken.btc'
-import TransactionBTC from '../Transaction.btc'
 import GetAddress, { chainNames } from '../../../Utils/WalletAddresses'
 
 const defaultObjWallet = {
@@ -55,28 +53,28 @@ export default class WalletBTC extends Wallet {
   @action async fetchingBalance(isRefresh = false, isBackground = false) {
     if (this.loading) return
 
-    this.loading = true
-    this.isRefresh = isRefresh
-    this.isFetchingBalance = !isRefresh && !isBackground
-    try {
-      const res = await api.fetchWalletBTCInfo(this.address)
-      if (res.status !== 200) {
-        this.balance = new BigNumber(`0`)
-        this.totalBalance = this.balance
-      } else if (res.data) {
-        this.balance = new BigNumber(`${res.data.final_balance}`)
-        this.totalBalance = this.balance.times(new BigNumber('1e-8'))
-      } else {
-        this.balance = new BigNumber(`0`)
-        this.totalBalance = this.balance
-      }
-      this.tokens = [this.getTokenBTC()]
-      this.tokens[0].transactions = res.data.txs.map(tx => new TransactionBTC(tx, 1))
-      this.update()
-      this.offLoading()
-    } catch (e) {
-      this.offLoading()
-    }
+    // this.loading = true
+    // this.isRefresh = isRefresh
+    // this.isFetchingBalance = !isRefresh && !isBackground
+    // try {
+    //   const res = await api.fetchWalletBTCInfo(this.address)
+    //   if (res.status !== 200) {
+    //     this.balance = new BigNumber(`0`)
+    //     this.totalBalance = this.balance
+    //   } else if (res.data) {
+    //     this.balance = new BigNumber(`${res.data.final_balance}`)
+    //     this.totalBalance = this.balance.times(new BigNumber('1e-8'))
+    //   } else {
+    //     this.balance = new BigNumber(`0`)
+    //     this.totalBalance = this.balance
+    //   }
+    //   this.tokens = [this.getTokenBTC()]
+    //   this.tokens[0].transactions = res.data.txs.map(tx => new TransactionBTC(tx, 1))
+    //   this.update()
+    //   this.offLoading()
+    // } catch (e) {
+    //   this.offLoading()
+    // }
   }
 
   @action async implementPrivateKey(secureDS, privateKey, coin = chainNames.BTC) {

@@ -5,26 +5,34 @@ import WalletDS from '../../DataSource/WalletDS'
 import GetAddress, { chainNames } from '../../../Utils/WalletAddresses'
 import { ethers } from 'ethers'
 
-export const generateNew = async (secureDS, title, index = 0, path = Keystore.CoinType.ETH.path, coin = chainNames.ETH, network = 'mainnet') => {
+export const generateNew = async (secureDS, title, indexETH=0, indexBTC=0, pathETH, pathBTC, network = 'mainnet') => {
   if (!secureDS) throw new Error('Secure data source is required')
   const mnemonic = await secureDS.deriveMnemonic()
-  // const { private_key } = await Keystore.createHDKeyPair(mnemonic, '', path, index)
-  const provider = ethers.getDefaultProvider('ropsten') //production ? 'mainnet' : 'ropsten'
-  provider.getBalance = provider.getBalance.bind(provider)
-  const wallet = ethers.Wallet.fromMnemonic(mnemonic).connect(provider)
-  const private_key = wallet.privateKey
+
+  // const { private_key } = await Keystore.createHDKeyPair(mnemonic, '', "m/44'/60'/0'/0", index)
+  const provider = ethers.getDefaultProvider(network) //production ? 'mainnet' : 'ropsten'
+  const walletETH = ethers.Wallet.fromMnemonic(mnemonic, pathETH).connect(provider)
+  const private_key_ETH = walletETH.privateKey
+  const walletBTC = ethers.Wallet.fromMnemonic(mnemonic, pathBTC).connect(provider)
+  const private_key_BTC = walletBTC.privateKey
+
+  const ethAddressObject = GetAddress(private_key_ETH, chainNames.ETH, network)
+  const ethAddress = ethAddressObject.address
+  secureDS.savePrivateKey(ethAddress, private_key_ETH)
   
-  const { address } = GetAddress(private_key, coin, network)
-  secureDS.savePrivateKey(address, private_key)
+  const btcAddressObject = GetAddress(private_key_BTC, chainNames.BTC, network)
+  let btcAddress = btcAddressObject.address
+  secureDS.savePrivateKey(btcAddress, private_key_BTC)
   
-  if (coin === chainNames.ETH) {
-    return new EthWallet({
-      address, balance: '0', index, title, isFetchingBalance: true
-    }, secureDS)
-  }
-  return new BtcWallet({
-    address, balance: '0', index, title, isFetchingBalance: true
+  let btcWallet = new BtcWallet({
+    address:btcAddress, balance: '0', indexBTC, title, isFetchingBalance: true
   }, secureDS)
+
+  let ethWallet = new EthWallet({
+    address:ethAddress, balance:'0', indexETH, title, isFetchingBalance: true
+  }, secureDS)
+
+  return [ethWallet, btcWallet]
 }
 
 export const importPrivateKey = (privateKey, title, secureDS, coin = chainNames.ETH, network = 'mainnet') => {

@@ -1,9 +1,6 @@
 import { observable, action, computed } from 'mobx'
 import { BigNumber } from 'bignumber.js'
-// import appState from '../AppState'
-import API from '../../api'
-import Transaction from './Transaction'
-import UnspendTransactionDS from '../DataSource/UnspendTransactionDS'
+import appState from '../AppState'
 
 export default class WalletToken {
   @observable title = ''
@@ -25,7 +22,7 @@ export default class WalletToken {
   belongsToWalletAddress = null
 
   static fetchTokenDetail = (address, contract) => {
-    return API.fetchTokenDetail(address, contract).then(res => new WalletToken(res.data.data, address))
+    // return API.fetchTokenDetail(address, contract).then(res => new WalletToken(res.data.data, address))
   }
 
   constructor(obj, belongsToWalletAddress) {
@@ -44,9 +41,7 @@ export default class WalletToken {
   @action setBalance = (v) => { this.balance = v }
 
   @action async addUnspendTransaction(obj) {
-    const unspendTx = Transaction.generateUnspendTransaction(obj, this)
-    await UnspendTransactionDS.addTransaction(unspendTx)
-    return unspendTx
+    
   }
 
   @computed get unspendTransactions() {
@@ -107,30 +102,30 @@ export default class WalletToken {
 
     let data = {}
 
-    // const { address } = appState.selectedWallet
+    const { address } = appState.selectedWallet
 
-    // if (address === this.address) {
-    //   data = {
-    //     module: 'account',
-    //     action: 'txlist',
-    //     address,
-    //     startblock: 0,
-    //     sort: 'desc',
-    //     endblock: 99999999,
-    //     offset: 16,
-    //     apikey: 'SVUJNQSR2APDFX89JJ1VKQU4TKMB6W756M'
-    //   }
-    // } else {
-    //   data = {
-    //     module: 'account',
-    //     action: 'tokentx',
-    //     address,
-    //     contractaddress: this.address,
-    //     offset: 16,
-    //     sort: 'desc',
-    //     symbol: this.title
-    //   }
-    // }
+    if (address === this.address) {
+      data = {
+        module: 'account',
+        action: 'txlist',
+        address,
+        startblock: 0,
+        sort: 'desc',
+        endblock: 99999999,
+        offset: 16,
+        apikey: 'SVUJNQSR2APDFX89JJ1VKQU4TKMB6W756M'
+      }
+    } else {
+      data = {
+        module: 'account',
+        action: 'tokentx',
+        address,
+        contractaddress: this.address,
+        offset: 16,
+        sort: 'desc',
+        symbol: this.title
+      }
+    }
 
     // API.fetchTransactions(this.address, data, this.txFetcherInfo.page).then((res) => {
     //   let txArr = res.data.result.map(t => new Transaction(t, this)).reduce((_result, _tx) => {

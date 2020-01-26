@@ -4,13 +4,7 @@ import Config from './stores/Config'
 import Constants from '../constants/constant'
 import AppWalletsStore from './AppWalletsStore'
 import AppDS from './DataSource/AppDS'
-import Reactions from './Reactions'
-import AddressBookDS from './DataSource/AddressBookDS'
-import UnspendTransactionDS from './DataSource/UnspendTransactionDS'
-import BgJobs from './BackgroundJobs'
-import api from '../api'
 import MixpanelHandler from '../Handler/MixpanelHandler'
-import NotificationStore from './stores/Notification'
 
 class AppState {
     dataVersion = '1'
@@ -19,7 +13,6 @@ class AppState {
     @observable selectedWallet = null // for sending transaction
     @observable selectedToken = null // for sending transaction
     @observable selectedTransaction = null
-    @observable addressBooks = []
     @observable rateETHDollar = new BigNumber(0)
     @observable rateBTCDollar = new BigNumber(0)
     @observable hasPassword = false
@@ -45,35 +38,18 @@ class AppState {
   
     constructor() {
       this.appWalletsStore = new AppWalletsStore()
-      this.BgJobs = {
-        CheckBalance: new BgJobs.CheckBalance(this, this.TIME_INTERVAL),
-        CheckPendingTransaction: new BgJobs.CheckPendingTransaction(this, this.TIME_INTERVAL)
-      }
     }
   
     startAllServices() {
-      Reactions.auto.listenConfig(this)
-      Reactions.auto.listenConnection(this)
       this.getRateETHDollar()
       this.getRateBTCDollar()
       this.getGasPriceEstimate()
     }
-  
-    startAllBgJobs() {
-      this.BgJobs.CheckBalance.doOnce()
-      this.BgJobs.CheckPendingTransaction.doOnce()
-      this.BgJobs.CheckBalance.start()
-      this.BgJobs.CheckPendingTransaction.start()
-    }
-  
+    
     initMixpanel() {
       this.mixpanleHandler = new MixpanelHandler()
     }
-  
-    syncWalletAddresses() {
-      NotificationStore.addWallets()
-    }
-  
+    
     @action setConfig = (cf) => { this.config = cf }
     @action setBackup = (isBackup) => { this.didBackup = isBackup }
     @action setSelectedWallet = (w) => { this.selectedWallet = w }
@@ -83,25 +59,7 @@ class AppState {
     @action setUnpendTransactions = (ut) => { this.unpendTransactions = ut }
     @action setLastestVersionRead = (lvr) => { this.lastestVersionRead = lvr }
     @action setShouldShowUpdatePopup = (isShow) => { this.shouldShowUpdatePopup = isShow }
-  
-    @action async syncAddressBooks() {
-      await AddressBookDS.getAddressBooks().then((_addressBooks) => {
-        const addressBooks = _addressBooks
-        const addressBookMap = addressBooks.reduce((_rs, ab, i) => {
-          const rs = _rs
-          rs[ab.address] = i
-          return rs
-        }, {})
-  
-        this.addressBooks.forEach((ab) => {
-          const index = addressBookMap[ab.address]
-          addressBooks[index] = ab
-        })
-  
-        this.addressBooks = addressBooks
-      })
-    }
-  
+    
     @action autoSetSelectedWallet() {
       const lastIndex = this.wallets.length - 1
       if (lastIndex < 0) this.setSelectedWallet(null)
@@ -130,40 +88,37 @@ class AppState {
     @action async getRateETHDollar() {
       setTimeout(async () => {
         if (this.internetConnection === 'online') {
-          const rs = await api.fetchRateETHDollar()
-          const rate = rs.data && rs.data.RAW && rs.data.RAW.ETH && rs.data.RAW.ETH.USD
+          // const rate = rs.data && rs.data.RAW && rs.data.RAW.ETH && rs.data.RAW.ETH.USD
   
-          if (rate.PRICE != this.rateETHDollar) {
-            this.rateETHDollar = new BigNumber(rate.PRICE)
-          }
+          // if (rate.PRICE != this.rateETHDollar) {
+          //   this.rateETHDollar = new BigNumber(rate.PRICE)
+          // }
         }
       }, 100)
     }
   
     @action async getRateBTCDollar() {
       setTimeout(async () => {
-        const rs = await api.fetchRateBTCDollar()
-        const rate = rs.data && rs.data.RAW && rs.data.RAW.BTC && rs.data.RAW.BTC.USD
+        // const rate = rs.data && rs.data.RAW && rs.data.RAW.BTC && rs.data.RAW.BTC.USD
   
-        if (rate.PRICE != this.rateBTCDollar) {
-          this.rateBTCDollar = new BigNumber(rate.PRICE)
-        }
+        // if (rate.PRICE != this.rateBTCDollar) {
+        //   this.rateBTCDollar = new BigNumber(rate.PRICE)
+        // }
       }, 100)
     }
   
     @action async getGasPriceEstimate() {
       setTimeout(async () => {
         if (this.config.network === Config.networks.mainnet && this.internetConnection === 'online') {
-          const res = await api.fetchGasPrice()
-          const data = typeof res.data === 'object'
-            ? {
-              slow: !isNaN(res.data.safeLow / 10) ? Math.floor(res.data.safeLow / 10) : 2,
-              standard: !isNaN(res.data.average / 10) ? Math.floor(res.data.average / 10) : 10,
-              fast: !isNaN(res.data.fastest / 10) ? Math.floor(res.data.fastest / 10) : 60
-            }
-            : this.gasPriceEstimate
+          // const data = typeof res.data === 'object'
+          //   ? {
+          //     slow: !isNaN(res.data.safeLow / 10) ? Math.floor(res.data.safeLow / 10) : 2,
+          //     standard: !isNaN(res.data.average / 10) ? Math.floor(res.data.average / 10) : 10,
+          //     fast: !isNaN(res.data.fastest / 10) ? Math.floor(res.data.fastest / 10) : 60
+          //   }
+          //   : this.gasPriceEstimate
   
-          this.gasPriceEstimate = data
+          // this.gasPriceEstimate = data
         } else {
           this.gasPriceEstimate = {
             slow: 2,
@@ -179,8 +134,6 @@ class AppState {
     }
   
     @action async loadPendingTxs() {
-      const unspendTransactions = await UnspendTransactionDS.getTransactions()
-      this.unpendTransactions = unspendTransactions
     }
   
     @action async import(orgData) {
@@ -190,8 +143,6 @@ class AppState {
       this.didBackup = data.didBackup
       this.currentWalletIndex = data.currentWalletIndex || 0
       this.currentBTCWalletIndex = data.currentBTCWalletIndex || 0
-      const addressBooks = await AddressBookDS.getAddressBooks()
-      this.addressBooks = addressBooks
       this.shouldShowUpdatePopup = data.shouldShowUpdatePopup !== undefined ? data.shouldShowUpdatePopup : true
       this.lastestVersionRead = data.lastestVersionRead
       this.allowDailyUsage = data.allowDailyUsage
@@ -242,8 +193,6 @@ class AppState {
       this.setHasPassword(false)
       this.setBackup(false)
       this.currentWalletIndex = 0
-      this.setUnpendTransactions([])
-      this.addressBooks = []
       this.appWalletsStore.removeAll()
     }
   

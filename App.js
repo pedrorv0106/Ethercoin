@@ -7,9 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import AppNavigator from './navigation/AppNavigator';
 
-import currencyStore from './AppStores/CurrencyStore'
 import MainStore from './AppStores/MainStore'
-import NotificationStore from './AppStores/stores/Notification'
 
 export default function App(props) {
   const [isLoadingComplete, setLoadingComplete] = useState(false);
@@ -52,10 +50,6 @@ async function loadResourcesAsync() {
   ]);
   
   await MainStore.startApp();
-  // NetInfo.addEventListener(
-  //   'connectionChange',
-  //   this.handleFirstConnectivityChange
-  // )
 }
 
 function handleLoadingError(error) {
@@ -68,11 +62,6 @@ async function handleFinishLoading(setLoadingComplete) {
   setLoadingComplete(true);
 
   AppState.addEventListener('change', this._handleAppStateChange);
-  try {
-    await currencyStore.getCurrencyAPI()
-  } catch (e) {
-    console.log(e.message)
-  }
 }
 
 handleFirstConnectivityChange = (connection) => {
@@ -92,14 +81,7 @@ _handleAppStateChange = (nextAppState) => {
   if (nextAppState === 'inactive' || nextAppState === 'background') {
     Keyboard.dismiss()
   }
-  if (nextAppState === 'background') {
-    NotificationStore.appState = nextAppState
-  }
-  if (nextAppState === 'active') {
-    setTimeout(() => { NotificationStore.appState = nextAppState }, 2000)
-    MainStore.appState.BgJobs.CheckBalance.start()
-    this.blind.hideBlind()
-  }
+  
   if (this.appState === 'background' && nextAppState === 'active') {
     
   }

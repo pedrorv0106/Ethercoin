@@ -3,11 +3,9 @@ import MnemonicDS from './SecureMnemonicDS'
 import PrivateKeyDS from './SecurePrivateKeyDS'
 import { ethers } from 'ethers'
 
-const { RNRandomBytes } = NativeModules
 const dataKey = `PASSWORD`
 const IVKey = `IVKey`
 const passwordValue = `PASSWORD`
-const pinValue = `111111`
 
 export default class SecureDS {
   pincode = ''
