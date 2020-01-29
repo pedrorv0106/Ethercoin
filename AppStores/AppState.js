@@ -3,6 +3,7 @@ import BigNumber from 'bignumber.js'
 import Config from './stores/Config'
 import Constants from '../constants/constant'
 import AppWalletsStore from './AppWalletsStore'
+import AppCoinsStore from './AppCoinsStore'
 import AppDS from './DataSource/AppDS'
 import MixpanelHandler from '../Handler/MixpanelHandler'
 
@@ -38,6 +39,7 @@ class AppState {
   
     constructor() {
       this.appWalletsStore = new AppWalletsStore()
+      this.appCoinsStore = new AppCoinsStore()
     }
   
     startAllServices() {
@@ -149,6 +151,7 @@ class AppState {
   
       await this.loadPendingTxs()
       await this.appWalletsStore.getWalletFromDS()
+      await this.appCoinsStore.getCoinFromDS()
   
       if (this.wallets.length > 0) {
         this.setSelectedWallet(this.wallets[0])
@@ -179,6 +182,10 @@ class AppState {
       }
       return this.appWalletsStore.wallets
     }
+
+    @computed get coins() {
+      return this.appCoinsStore.coins
+    }
   
     @computed get enableNotification() {
       if (this.wallets.length == 0) return true
@@ -194,6 +201,7 @@ class AppState {
       this.setBackup(false)
       this.currentWalletIndex = 0
       this.appWalletsStore.removeAll()
+      this.appCoinsStore.removeAll()
     }
   
     save() {

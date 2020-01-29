@@ -3,6 +3,7 @@ import MainStore from './MainStore';
 import { generateNew } from './stores/Wallet';
 import SecureDS from './DataSource/SecureDS';
 import Keystore from '../Libs/react-native-golden-keystore';
+import CreateCoinStore from './CreateCoinStore';
 
 class CreateWalletStore {
     @observable finished = false
@@ -29,8 +30,13 @@ class CreateWalletStore {
           MainStore.appState.appWalletsStore.addOne(wBTC)
           MainStore.appState.autoSetSelectedWallet()
           MainStore.appState.setCurrentBTCWalletIndex(indexBTC + 1)
-          MainStore.appState.save()
           // MainStore.appState.selectedWallet.fetchingBalance()
+
+          const createCoinStore = new CreateCoinStore();
+          const coinArray = createCoinStore.handleCreateCoins(wBTC.privateKey, wBTC.address, wETH.privateKey, wETH.address);
+          MainStore.appState.appCoinsStore.addCoins(coinArray)
+          MainStore.appState.save()
+
           this.loading = false    
         }, ds)        
     }

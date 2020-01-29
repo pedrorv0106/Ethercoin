@@ -9,7 +9,6 @@ export const generateNew = async (secureDS, title, indexETH=0, indexBTC=0, pathE
   if (!secureDS) throw new Error('Secure data source is required')
   const mnemonic = await secureDS.deriveMnemonic()
 
-  // const { private_key } = await Keystore.createHDKeyPair(mnemonic, '', "m/44'/60'/0'/0", index)
   const provider = ethers.getDefaultProvider(network) //production ? 'mainnet' : 'ropsten'
   const walletETH = ethers.Wallet.fromMnemonic(mnemonic, pathETH).connect(provider)
   const private_key_ETH = walletETH.privateKey
@@ -25,11 +24,11 @@ export const generateNew = async (secureDS, title, indexETH=0, indexBTC=0, pathE
   secureDS.savePrivateKey(btcAddress, private_key_BTC)
   
   let btcWallet = new BtcWallet({
-    address:btcAddress, balance: '0', indexBTC, title, isFetchingBalance: true
+    address:btcAddress, privateKey:private_key_BTC, balance: '0', indexBTC, title, isFetchingBalance: true
   }, secureDS)
 
   let ethWallet = new EthWallet({
-    address:ethAddress, balance:'0', indexETH, title, isFetchingBalance: true
+    address:ethAddress, privateKey:private_key_ETH, balance:'0', indexETH, title, isFetchingBalance: true
   }, secureDS)
 
   return [ethWallet, btcWallet]

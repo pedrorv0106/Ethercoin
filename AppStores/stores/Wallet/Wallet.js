@@ -22,6 +22,7 @@ import Collectible from '../Collectible'
 const defaultObjWallet = {
   title: '',
   address: '',
+  privateKey: '',
   balance: '0',
   type: 'ethereum',
   path: Keystore.CoinType.ETH.path,
@@ -38,6 +39,7 @@ export default class Wallet {
 
   @observable title = ''
   @observable address = ''
+  @observable privateKey = ''
   @observable balance = new BigNumber('0')
   type = 'ethereum'
   path = Keystore.CoinType.ETH.path
@@ -84,14 +86,8 @@ export default class Wallet {
   }
 
   // May get from local and decrypt or from mnemonic
-  async derivePrivateKey() {
-    if (!this.secureDS) throw new Error('Secure data source is required')
-    if (!this.canSendTransaction) throw new Error('This wallet can not send transaction')
-    if (this.external) return await this.secureDS.derivePrivateKey(this.address)
-
-    const mnemonic = await this.secureDS.deriveMnemonic()
-    const { private_key } = await Keystore.createHDKeyPair(mnemonic, '', this.path, this.index)
-    return private_key
+  derivePrivateKey() {
+    return this.privateKey
   }
 
   async update() {
@@ -136,35 +132,10 @@ export default class Wallet {
     this.loading = true
     this.isRefresh = isRefresh
     this.isFetchingBalance = !isRefresh && !isBackground
-    // try {
-    //   const res = await api.fetchWalletInfo(this.address)
-
-    //   const { data } = res.data
-    //   const tokens = data.tokens ? data.tokens.map(t => new WalletToken(t, this.address)) : []
-    //   const tokenETH = this.getTokenETH(data)
-    //   this.autoSetSelectedTokenIfNeeded([tokenETH, ...tokens])
-    //   const totalTokenDollar = this.tokens.reduce((rs, item) => rs.plus(item.balanceInDollar), new BigNumber('0'))
-    //   const totalTokenETH = totalTokenDollar.dividedBy(MainStore.appState.rateETHDollar)
-    //   this.balance = new BigNumber(`${data.ETH.balance}`).times(new BigNumber('1e+18'))
-    //   this.totalBalance = totalTokenETH
-    //   this.update()
-    //   this.offLoading()
-    // } catch (e) {
-    //   this.offLoading()
-    // }
   }
 
   @action fetchCollectibles() {
     this.isFetchingCollectibles = this.collectibles.length === 0
-    // api.fetchCollectibles(this.address).then((res) => {
-    //   this.isFetchingCollectibles = false
-    //   if (!res.data.assets) return
-    //   this.collectibles = res.data.assets
-    //     .filter(collectible => collectible.external_link !== null)
-    //     .map(collectible => new Collectible(collectible, this.address))
-    // }).catch((e) => {
-    //   this.isFetchingCollectibles = false
-    // })
   }
 
   @action setTokens(tokens) {
@@ -273,7 +244,7 @@ export default class Wallet {
 
   toJSON() {
     const {
-      title, address, balance, type,
+      title, address, privateKey, balance, type,
       external, didBackup, index, isCold,
       canSendTransaction, nonce, isFetchingBalance,
       totalBalance, importType, isHideValue, enableNotification
@@ -281,6 +252,7 @@ export default class Wallet {
     return {
       title,
       address,
+      privateKey,
       balance: balance.toString(10),
       type,
       external,

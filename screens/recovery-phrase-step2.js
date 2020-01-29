@@ -24,8 +24,7 @@ export default class RecoveryStepTwoComponent extends Component {
     if(passphraseInputValue1 === listKeywordRandom[0]
       && passphraseInputValue2 === listKeywordRandom[1]
       && passphraseInputValue3 === listKeywordRandom[2]
-      && passphraseInputValue4 === listKeywordRandom[3]) {
-        
+      && passphraseInputValue4 === listKeywordRandom[3]) {        
         const createWalletStore = new CreateWalletStore();
         createWalletStore.handleCreateWallet();
 
