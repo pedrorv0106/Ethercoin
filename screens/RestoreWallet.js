@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import { Platform, StyleSheet, View, ImageBackground, TouchableOpacity, Image, ScrollView, Alert } from 'react-native';
 import { Input, Text } from 'native-base';
-import MainStore from '../AppStores/MainStore';
-import BackupStore from '../AppStores/BackupStore';
+import MainStore from '../appstores/MainStore';
+import BackupStore from '../appstores/BackupStore';
 
 export default class RestoreWalletComponent extends Component {
   static navigationOptions = {

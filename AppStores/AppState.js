@@ -4,8 +4,8 @@ import Config from './stores/Config'
 import Constants from '../constants/constant'
 import AppWalletsStore from './AppWalletsStore'
 import AppCoinsStore from './AppCoinsStore'
-import AppDS from './DataSource/AppDS'
-import MixpanelHandler from '../Handler/MixpanelHandler'
+import AppDS from './datasource/AppDS'
+import MixpanelHandler from '../handler/MixpanelHandler'
 
 class AppState {
     dataVersion = '1'

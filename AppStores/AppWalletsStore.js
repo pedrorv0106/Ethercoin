@@ -1,5 +1,5 @@
 import { observable, action } from 'mobx'
-import WalletDS from './DataSource/WalletDS'
+import WalletDS from './datasource/WalletDS'
 
 export default class AppWalletsStore {
   @observable wallets = []

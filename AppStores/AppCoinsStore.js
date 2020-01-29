@@ -1,5 +1,5 @@
 import { observable, action } from 'mobx'
-import CoinDS from './DataSource/CoinDS'
+import CoinDS from './datasource/CoinDS'
 
 export default class AppCoinsStore {
   @observable coins = []

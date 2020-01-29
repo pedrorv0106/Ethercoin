@@ -1,7 +1,7 @@
 import { observable, action, computed } from 'mobx'
 import shuffle from 'lodash.shuffle'
-import HapticHandler from '../Handler/HapticHandler'
-import MainStore from '../AppStores/MainStore'
+import HapticHandler from '../handler/HapticHandler'
+import MainStore from '../appstores/MainStore'
 
 export default class BackupStore {
     @observable.ref mnemonic = null

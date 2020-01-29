@@ -1,7 +1,7 @@
 import BtcWallet from './Wallet.btc'
 import EthWallet from './Wallet'
 import Keystore from '../../../Libs/react-native-golden-keystore'
-import WalletDS from '../../DataSource/WalletDS'
+import WalletDS from '../../datasource/WalletDS'
 import GetAddress, { chainNames } from '../../../Utils/WalletAddresses'
 import { ethers } from 'ethers'
 

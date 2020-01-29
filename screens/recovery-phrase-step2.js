@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import { Platform, StyleSheet, View, ImageBackground, Alert, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { Input, Text } from 'native-base';
-import MainStore from '../AppStores/MainStore';
-import CreateWalletStore from '../AppStores/CreateWalletStore';
+import MainStore from '../appstores/MainStore';
+import CreateWalletStore from '../appstores/CreateWalletStore';
 import { chainNames } from '../Utils/WalletAddresses';
 
 export default class RecoveryStepTwoComponent extends Component {

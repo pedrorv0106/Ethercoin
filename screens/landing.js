@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Platform, StyleSheet, View, ImageBackground, Image} from 'react-native';
 import { Button, Text } from 'native-base';
-import MainStore from '../AppStores/MainStore';
+import MainStore from '../appstores/MainStore';
 
 export default class LandingComponent extends Component {
 static navigationOptions = {

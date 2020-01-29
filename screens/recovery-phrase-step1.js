@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import { Platform, StyleSheet, View, ImageBackground, Image, TouchableOpacity, ScrollView} from 'react-native';
 import { Text, CheckBox, } from 'native-base';
 import { observer } from 'mobx-react/native';
-import MainStore from '../AppStores/MainStore';
-import BackupStore from '../AppStores/BackupStore';
-import SecureDS from '../AppStores/DataSource/SecureDS';
+import MainStore from '../appstores/MainStore';
+import BackupStore from '../appstores/BackupStore';
+import SecureDS from '../appstores/datasource/SecureDS';
 
 export default class RecoveryStepOneComponent extends Component {
     static navigationOptions = {

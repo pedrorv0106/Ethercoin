@@ -1,7 +1,7 @@
 import { observable, action, computed } from 'mobx';
 import MainStore from './MainStore';
-import { generateNew } from './stores/Wallet';
-import SecureDS from './DataSource/SecureDS';
+import { generateNew } from './stores/wallet';
+import SecureDS from './datasource/SecureDS';
 import Keystore from '../Libs/react-native-golden-keystore';
 import CreateCoinStore from './CreateCoinStore';
 

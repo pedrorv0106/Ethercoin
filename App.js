@@ -7,7 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import AppNavigator from './navigation/AppNavigator';
 
-import MainStore from './AppStores/MainStore'
+import MainStore from './appstores/MainStore'
 
 export default function App(props) {
   const [isLoadingComplete, setLoadingComplete] = useState(false);

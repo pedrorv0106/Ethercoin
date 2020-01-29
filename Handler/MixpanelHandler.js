@@ -1,5 +1,5 @@
 import Mixpanel from 'react-native-mixpanel'
-import MainStore from '../AppStores/MainStore'
+import MainStore from '../appstores/MainStore'
 
 const TOKEN_API = '227467372e7fe53dac6fea17eba63718'
 export default class MixpanelHandler {

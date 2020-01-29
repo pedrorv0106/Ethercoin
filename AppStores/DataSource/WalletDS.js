@@ -1,5 +1,5 @@
 import { AsyncStorage } from 'react-native'
-import { ETHWallet, BTCWallet } from '../stores/Wallet'
+import { ETHWallet, BTCWallet } from '../stores/wallet'
 import SecureDS from './SecureDS'
 
 const dataKey = 'WALLETS_STORAGE'
