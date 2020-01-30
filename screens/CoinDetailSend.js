@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
-import { Platform, StyleSheet, Image, View, ImageBackground, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, Image, View, ImageBackground, TouchableOpacity, ScrollView } from 'react-native';
 import { Container, Footer, FooterTab, Button,  Icon, Grid, Col, Text, Row, Textarea, Picker  } from 'native-base';
-
-
+import MainStore from '../appstores/MainStore';
 
 export default class CoinDetailSendComponent extends Component {
-
   static navigationOptions = {
     header: null,
   };
@@ -13,123 +11,158 @@ export default class CoinDetailSendComponent extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selected: "key1"
+      coins: null,
+      selectedCoin: null
     };
   }
-  onValueChange(value) {
+
+  async componentWillMount() {
+    this.loadCoinData()
+  }
+  async loadCoinData(){
+    let coins = await MainStore.appState.appCoinsStore.getCoinFromDS()
+    coins = coins.filter(c => c.isAdded === true)
+    this.setState({ coins, selectedCoin:coins[0] })
+    try {
+      const response = await fetch('https://api.coinmarketcap.com/v2/ticker/?limit=100&convert=GBP')
+      const posts = await response.json()
+      for(var k in posts.data) {
+        let index = this.getIndexCoin(posts.data[k].symbol)
+        if(index >= 0){
+          coins[index].gbpPrice = posts.data[k].quotes.GBP.price
+          this.setState({ coins })
+        }
+      }
+    } catch (e) { }
+  }
+
+  onValueChange(coin){
     this.setState({
-      selected: value
+      selectedCoin: coin
     });
+  }
+
+  renderPickerItems(){
+    const pickerItems = []
+    const {coins} = this.state
+    if(coins != null){
+      coins.forEach(c => {
+        const item = <Picker.Item key={c.token_symbol} label={c.token_name} value={c} />
+        pickerItems.push(item)
+      })
+    }
+    return pickerItems
   }
 
   render() {
     const {goBack} = this.props.navigation;
+    const { selectedCoin } = this.state
+    const pickerItems = this.renderPickerItems()
+    let cost = 0
+    let balance = 0
+    let symbol = ''
+    if(selectedCoin != null){
+      cost = selectedCoin.gbpPrice * selectedCoin.balance;
+      balance = selectedCoin.balance
+      symbol = selectedCoin.token_symbol
+    }
+
     return (
       <Container>
         <ScrollView style={ styles.ScrollViewContainer}>
-        <View style={ styles.container }>
-
-        <ImageBackground source={require('../assets/images/inner-header-bg2.jpg')} style={styles.backgroundImage}>            
-
-          <View style={styles.HeaderTop}>
-            <TouchableOpacity onPress={() => goBack()}>
-              <Image style={styles.rightbutton} source={require('../assets/images/backbutton.png')} />
-            </TouchableOpacity>
-            <View style={ styles.HeaderPicker}>
-            <Picker
-                mode="dropdown"
-                iosHeader="Select your SIM"
-                iosIcon={<Icon name="caret-down" type="FontAwesome" style={styles.DownArrow} />}
-                style={ styles.PageTitle}
-                selectedValue={this.state.selected}
-                onValueChange={this.onValueChange.bind(this)}
-                textStyle={{ fontSize:18,color:"#fff" }}
-                >                
-                <Picker.Item label="GBP" value="key0" />
-                <Picker.Item label="BTC" value="key1" />
-                
-            </Picker> 
+          <View style={ styles.container }>
+          <ImageBackground source={require('../assets/images/inner-header-bg2.jpg')} style={styles.backgroundImage}>            
+            <View style={styles.HeaderTop}>
+              <TouchableOpacity onPress={() => goBack()}>
+                <Image style={styles.rightbutton} source={require('../assets/images/backbutton.png')} />
+              </TouchableOpacity>
+              <View style={ styles.HeaderPicker}>
+                <Picker
+                  mode="dropdown"
+                  iosHeader="Select your SIM"
+                  iosIcon={<Icon name="caret-down" type="FontAwesome" style={styles.DownArrow} />}
+                  style={ styles.PageTitle}
+                  selectedValue={this.state.selectedCoin}
+                  onValueChange={this.onValueChange.bind(this)}
+                  textStyle={{ fontSize:18,color:"#fff" }}
+                  >                
+                  { pickerItems }
+                </Picker> 
+              </View>
+              <TouchableOpacity onPress={() => this.props.navigation.navigate('Settings')}>
+                <Image style={styles.leftbutton} source={require('../assets/images/icon2.png')} />
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity onPress={() => this.props.navigation.navigate('Settings')}>
-              <Image style={styles.leftbutton} source={require('../assets/images/icon2.png')} />
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.HeaderBottom}>
-              <Text style={styles.BalanceTitle}>0.0074 BTC</Text>
+            <View style={styles.HeaderBottom}>
+              <Text style={styles.BalanceTitle}>{balance.toFixed(4)} {symbol}</Text>
               <View style={styles.BalanceValue}>
                 <Text style={styles.BalanceValueImage}><Image style={styles.DownIcon} source={require('../assets/images/down2.png')} /></Text>
-                <Text style={styles.BalanceValueText}> £ 4749.80</Text>
+                <Text style={styles.BalanceValueText}> £ {cost.toFixed(2)}</Text>
               </View>
+            </View>
+          </ImageBackground>
+          <View style={styles.BTCContent}>
+            <Grid style={styles.BTCGrid}>
+              <Row style={styles.BTCTextRow}>
+                <Col>
+                  <Text style={styles.BTCPayText}>Pay to</Text>
+                </Col>
+                <Col>
+                  <TouchableOpacity style={styles.BTCTextRight}>
+                    <Text style={styles.BTCLink}>Scan QR Code</Text>
+                  </TouchableOpacity>
+                </Col>
+              </Row>
+              <Row>
+                <Col><Textarea style={styles.BTCTextarea} placeholder="Address" /></Col>          
+              </Row>
+            </Grid>
+            <Grid style={styles.BTCGrid}>
+              <Row style={styles.BTCTextRow}>
+                <Col><Text style={styles.BTCPayText}>Amount</Text></Col>
+                <Col>
+                  <TouchableOpacity style={styles.BTCTextRight}>
+                    <Text style={styles.BTCLink}>Use all funds</Text>
+                  </TouchableOpacity>
+                </Col>
+              </Row>
+              <Row>
+                <Col><Textarea style={styles.BTCTextarea} placeholder={symbol} /></Col>          
+              </Row>
+              <Row>
+                <Col><Textarea style={styles.BTCTextarea} placeholder="GBP" /></Col>          
+              </Row>
+            </Grid>
+            <Grid>
+            <Col>
+              <Button style={styles.SendButton}>
+                <Text style={styles.SendButtonText}>Send</Text>
+              </Button>
+            </Col>
+          </Grid>
           </View>
-
-        </ImageBackground>
-
-        <View style={styles.BTCContent}>
-        <Grid style={styles.BTCGrid}>
-          <Row style={styles.BTCTextRow}>
-          <Col><Text style={styles.BTCPayText}>Pay to</Text></Col>
-          <Col><TouchableOpacity style={styles.BTCTextRight}><Text style={styles.BTCLink}>Scan QR Code</Text></TouchableOpacity></Col>
-          </Row>
-          <Row>
-            <Col><Textarea style={styles.BTCTextarea} placeholder="Address" /></Col>          
-          </Row>
-        </Grid>
-
-        <Grid style={styles.BTCGrid}>
-          <Row style={styles.BTCTextRow}>
-          <Col><Text style={styles.BTCPayText}>Amount</Text></Col>
-          <Col><TouchableOpacity style={styles.BTCTextRight}><Text style={styles.BTCLink}>Use all funds</Text></TouchableOpacity></Col>
-          </Row>
-          <Row>
-            <Col><Textarea style={styles.BTCTextarea} placeholder="BTC" /></Col>          
-          </Row>
-
-          <Row>
-            <Col><Textarea style={styles.BTCTextarea} placeholder="GBP" /></Col>          
-          </Row>
-        </Grid>
-
-
-        <Grid>
-          <Col>
-          <Button style={styles.SendButton}>
-            <Text style={styles.SendButtonText}>Send</Text>
-          </Button>
-          </Col>
-        </Grid>
-
-        </View>
-        
-       
-         
-          
-
-          
-          
-
-        </View>
+          </View>
         </ScrollView>
         {/* Footer start */}
         <Footer style={styles.Footer}>
           <FooterTab style={styles.FooterTab}>
-          <ImageBackground source={require('../assets/images/tab-bg.jpg')} style={styles.Tabbackground}>
-            <Button style={styles.TabButton} onPress={() => this.props.navigation.navigate('Main')}>
-              <Image style={styles.TabButtonImage} source={require('../assets/images/icon3.png')} />
-              <Text style={styles.TabButtonText}>WALLET</Text>
-            </Button>
-            <Button style={styles.TabButton} onPress={() => this.props.navigation.navigate('CoinDetailReceive')}>
-            <Image style={styles.TabButtonImage} source={require('../assets/images/icon4.png')} />
-              <Text style={styles.TabButtonText}>RECEIVE</Text>
-            </Button>
-            <Button style={styles.TabButton} onPress={() => this.props.navigation.navigate('CoinDetailSend')}>
-            <Image style={styles.TabButtonImage} source={require('../assets/images/icon5.png')} />
-              <Text style={styles.TabButtonText}>SEND</Text>
-            </Button>
-            <Button style={styles.TabButton} onPress={() => this.props.navigation.navigate('ShapeshiftExchange')}>
-            <Image style={styles.TabButtonImage} source={require('../assets/images/icon6.png')} />
-              <Text style={styles.TabButtonText}>EXCHANGE</Text>
-            </Button>
+            <ImageBackground source={require('../assets/images/tab-bg.jpg')} style={styles.Tabbackground}>
+              <Button style={styles.TabButton} onPress={() => this.props.navigation.navigate('Main')}>
+                <Image style={styles.TabButtonImage} source={require('../assets/images/icon3.png')} />
+                <Text style={styles.TabButtonText}>WALLET</Text>
+              </Button>
+              <Button style={styles.TabButton} onPress={() => this.props.navigation.navigate('CoinDetailReceive')}>
+              <Image style={styles.TabButtonImage} source={require('../assets/images/icon4.png')} />
+                <Text style={styles.TabButtonText}>RECEIVE</Text>
+              </Button>
+              <Button style={styles.TabButton} onPress={() => this.props.navigation.navigate('CoinDetailSend')}>
+              <Image style={styles.TabButtonImage} source={require('../assets/images/icon5.png')} />
+                <Text style={styles.TabButtonText}>SEND</Text>
+              </Button>
+              <Button style={styles.TabButton} onPress={() => this.props.navigation.navigate('ShapeshiftExchange')}>
+              <Image style={styles.TabButtonImage} source={require('../assets/images/icon6.png')} />
+                <Text style={styles.TabButtonText}>EXCHANGE</Text>
+              </Button>
             </ImageBackground>
           </FooterTab>
         </Footer>
@@ -142,11 +175,12 @@ export default class CoinDetailSendComponent extends Component {
 
 
 const styles = StyleSheet.create({
-
   backgroundImage: { width:"100%", height:200, resizeMode: 'cover',},
   HeaderTop:{ flexDirection: 'row', justifyContent:"space-between", },
-  HeaderPicker:{ display:"flex",  borderColor:"#fff", borderWidth:1, borderRadius:3, paddingLeft:0, paddingRight:0, marginTop:40, marginBottom:30, height:35, width:100,   }, 
-  PageTitle:{  fontFamily:"LatoRegular", lineHeight:0, width:"100%", height:"100%",  margin:Platform.OS === 'ios' ? 0 : 0, alignItems:"center", textAlign:"center", fontSize:Platform.OS === 'ios' ? 20 : 50, color:"#fff", padding:0, fontWeight:"700", },
+  HeaderPicker:{ display:"flex",  borderColor:"#fff", borderWidth:1, borderRadius:3, paddingLeft:0, paddingRight:0, 
+                  marginTop:40, marginBottom:30, height:35, width:130 }, 
+  PageTitle:{ fontFamily:"LatoRegular", lineHeight:0, width:"100%", height:"100%",  margin: 0, alignItems:"center", 
+              textAlign:"center", fontSize: 50, color:"#fff" },
   rightbutton:{ marginLeft:20, marginTop:40},
   leftbutton:{ marginRight:20, marginTop:40},
   HeaderBottom:{ textAlign:"center",},

@@ -1,36 +1,179 @@
 import React, { Component } from 'react';
-import { Platform, StyleSheet, Text, View, ImageBackground, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { StyleSheet, Text, View, ImageBackground, TouchableOpacity, ScrollView, Image } from 'react-native';
 import { Container, Footer, FooterTab, Grid, Col, Picker, Icon, Row, Textarea, Button } from 'native-base';
-
+import MainStore from '../appstores/MainStore';
 
 export default class ShapeshiftExchangeComponent extends Component {
-
     static navigationOptions = {
         header: null,
     };
-
     constructor(props) {
         super(props);
         this.state = {
+            coins: null,
             isDropdownExchange: false,
-            dorpdownExchange: {
-                text: 'Bitcoin',
-                img: require('../assets/images/crypto-icon1.png')
-            },
+            exchangeCoin: null,
             isDropdownReceive: false,
-            dorpdownReceive: {
-                text: 'Ethereum',
-                img: require('../assets/images/crypto-icon2.png')
-            }
+            receiveCoin: null 
         }
+    }
+
+    async componentWillMount() {
+        this.loadCoinData()
+    }
+
+    async loadCoinData(){
+        let coins = await MainStore.appState.appCoinsStore.getCoinFromDS()
+        coins = coins.filter(c => c.isAdded === true)
+        let exchangeCoin = null
+        let receiveCoin = null
+        if(coins != null && coins.length > 0){
+            exchangeCoin = coins[0]
+        }
+        if(coins != null && coins.length > 1){
+            receiveCoin = coins[1]
+        }
+        this.setState({ coins, exchangeCoin, receiveCoin })
+    }
+
+    onNext(){
+
+    }
+    
+    renderExchangeField(){
+        const {exchangeCoin} = this.state
+        let ret
+        if(exchangeCoin){
+            let iconUrl
+            if(exchangeCoin.token_name === 'Bitcoin'){
+                iconUrl = require('../assets/images/crypto-icon1.png')
+            } else if(exchangeCoin.token_name === 'Ethereum'){
+                iconUrl = require('../assets/images/crypto-icon2.png')
+            } else {
+                iconUrl = require('../assets/images/crypto-icon3.png')
+            }
+            ret = <View>
+                <Button style={styles.cryptoDropdown}
+                    onPress={() => {
+                        this.setState({ isDropdownExchange: true })
+                    }}
+                >
+                    <Image style={styles.CryptoIcon} source={iconUrl} />
+                    <Text style={styles.cryptoDropdownText}>{exchangeCoin.token_name}</Text>
+                    <Icon name="caret-down" type="FontAwesome5" style={styles.cryptoDropdownArrow} />
+                </Button>
+            </View>
+        } else {
+            ret = <View></View>
+        }
+        return ret
+    }
+    renderReceiveField(){
+        const {receiveCoin} = this.state
+        let ret
+        if(receiveCoin){
+            let iconUrl
+            if(receiveCoin.token_name === 'Bitcoin'){
+                iconUrl = require('../assets/images/crypto-icon1.png')
+            } else if(receiveCoin.token_name === 'Ethereum'){
+                iconUrl = require('../assets/images/crypto-icon2.png')
+            } else {
+                iconUrl = require('../assets/images/crypto-icon3.png')
+            }
+            ret = <View>
+                <Button style={styles.cryptoDropdown}
+                onPress={() => {
+                    this.setState({ isDropdownReceive: true })
+                }}
+                >
+                    <Image style={styles.CryptoIcon} source={iconUrl} />
+                    <Text style={styles.cryptoDropdownText}>{receiveCoin.token_name}</Text>
+                    <Icon name="caret-down" type="FontAwesome5" style={styles.cryptoDropdownArrow} />
+                </Button>
+            </View>
+        } else {
+            ret = <View></View>
+        }
+        return ret
+    }
+    renderDropdownExchange(){
+        let {coins} = this.state
+        let contents =[]
+        if(coins){
+            coins.forEach(c => {
+                let iconUrl
+                if(c.token_name === 'Bitcoin'){
+                    iconUrl = require('../assets/images/crypto-icon1.png')
+                } else if(c.token_name === 'Ethereum'){
+                    iconUrl = require('../assets/images/crypto-icon2.png')
+                } else {
+                    iconUrl = require('../assets/images/crypto-icon3.png')
+                }
+                item = <Button style={styles.CryptoModalButton}
+                        onPress={() => {
+                            this.setState({
+                                isDropdownExchange: false,
+                                exchangeCoin: c
+                            })
+                        }}
+                    >
+                        <Image style={styles.CryptoModalIcon} source={iconUrl} />
+                        <Text style={styles.CryptoModalButtonText}>{c.token_name}</Text>
+                    </Button>
+                contents.push(item)
+            })
+        }
+        return contents
+    }
+    renderDropdownReceive(){
+        let {coins} = this.state
+        let contents =[]
+        if(coins){
+            coins.forEach(c => {
+                let iconUrl
+                if(c.token_name === 'Bitcoin'){
+                    iconUrl = require('../assets/images/crypto-icon1.png')
+                } else if(c.token_name === 'Ethereum'){
+                    iconUrl = require('../assets/images/crypto-icon2.png')
+                } else {
+                    iconUrl = require('../assets/images/crypto-icon3.png')
+                }
+                item = <Button style={styles.CryptoModalButton}
+                        onPress={() => {
+                            this.setState({
+                                isDropdownReceive: false,
+                                receiveCoin: c
+                            })
+                        }}
+                        >
+                        <Image style={styles.CryptoModalIcon} source={iconUrl} />
+                        <Text style={styles.CryptoModalButtonText}>{c.token_name}</Text>
+                    </Button>
+                contents.push(item)
+            })
+        }
+        return contents
     }
 
     render() {
         const { goBack } = this.props.navigation;
+        const {exchangeCoin, receiveCoin} = this.state
+        let exchangeHintText = ''
+        let receiveHintText = ''
+        if(exchangeCoin){
+            exchangeHintText = exchangeCoin.token_symbol
+        }
+        if(receiveCoin){
+            receiveHintText = receiveCoin.token_symbol
+        }
+        const dropdownExchange = this.renderDropdownExchange()
+        const dropdownReceive = this.renderDropdownReceive()
+        const exchangeField = this.renderExchangeField()
+        const receiveField = this.renderReceiveField()
+        
         return (
             <Container>
                 <View style={styles.container}>
-
                     <ImageBackground source={require('../assets/images/inner-header-bg.jpg')} style={styles.backgroundImage}>
                         <TouchableOpacity onPress={() => goBack()}>
                             <Image style={styles.rightbutton} source={require('../assets/images/backbutton.png')} />
@@ -46,44 +189,18 @@ export default class ShapeshiftExchangeComponent extends Component {
                         </TouchableOpacity>
                     </ImageBackground>
                     <ScrollView style={styles.ScrollViewContainer}>
-
-
                         <Text style={styles.ChangellyText1}>Select the coins you wisth to exchange. The converted coins will be automatically added to your wallet.</Text>
                         <Text style={styles.ChangellyText2}>Given rate includes transaction fee</Text>
-
                         <Grid style={styles.SelectGrid}>
                             <Col style={styles.GridCol}>
                                 <Text style={styles.ColTitle}>Exchange</Text>
-                                <View>
-                                    <Button style={styles.cryptoDropdown}
-                                        onPress={() => {
-                                            this.setState({ isDropdownExchange: true })
-                                        }}
-                                    >
-                                        <Image style={styles.CryptoIcon} source={this.state.dorpdownExchange.img} />
-                                        <Text style={styles.cryptoDropdownText}>{this.state.dorpdownExchange.text}</Text>
-                                        <Icon name="caret-down" type="FontAwesome5" style={styles.cryptoDropdownArrow} />
-                                    </Button>
-                                </View>
+                                {exchangeField}
                             </Col>
-
-
                             <Col style={styles.GridCol}>
                                 <Text style={styles.ColTitle}>Receive</Text>
-                                <View>
-                                    <Button style={styles.cryptoDropdown}
-                                     onPress={() => {
-                                        this.setState({ isDropdownReceive: true })
-                                    }}
-                                    >
-                                       <Image style={styles.CryptoIcon} source={this.state.dorpdownReceive.img} />
-                                        <Text style={styles.cryptoDropdownText}>{this.state.dorpdownReceive.text}</Text>
-                                        <Icon name="caret-down" type="FontAwesome5" style={styles.cryptoDropdownArrow} />
-                                    </Button>
-                                </View>
+                                {receiveField}
                             </Col>
                         </Grid>
-
 
                         <Grid style={styles.BTCGrid}>
                             <Row style={styles.BTCTextRow}>
@@ -91,27 +208,25 @@ export default class ShapeshiftExchangeComponent extends Component {
                                 <Col><TouchableOpacity style={styles.BTCTextRight}><Text style={styles.BTCLink}>Use all funds</Text></TouchableOpacity></Col>
                             </Row>
                             <Row>
-                                <Col><Textarea style={styles.BTCTextarea} placeholder="BTC" /></Col>
+                                <Col><Textarea style={styles.BTCTextarea} placeholder={exchangeHintText} /></Col>
                             </Row>
-
                             <Row>
-                                <Col><Textarea style={styles.BTCTextarea} placeholder="ETH" /></Col>
+                                <Col><Textarea style={styles.BTCTextarea} placeholder={receiveHintText} /></Col>
                             </Row>
                         </Grid>
-
 
                         <Grid style={styles.PoweredGrid}>
                             <Row style={styles.PoweredRow}>
                                 <Col style={styles.PoweredCol}><Text style={styles.PoweredText}>Powered by</Text><Image style={styles.TabButtonImage} source={require('../assets/images/Powered-icon.jpg')} /></Col>
-                                <Col style={styles.PoweredColRight}><TouchableOpacity style={styles.PoweredButton}><Text style={styles.PoweredButtonText}>Next</Text></TouchableOpacity></Col>
+                                <Col style={styles.PoweredColRight}>
+                                    <TouchableOpacity onPress={() => this.onNext()} style={styles.PoweredButton}>
+                                        <Text style={styles.PoweredButtonText}>Next</Text>
+                                    </TouchableOpacity>
+                                </Col>
                             </Row>
-
                         </Grid>
-
                     </ScrollView>
-
                 </View>
-
 
                 {/* Footer start */}
                 <Footer style={styles.Footer}>
@@ -136,217 +251,29 @@ export default class ShapeshiftExchangeComponent extends Component {
                         </ImageBackground>
                     </FooterTab>
                 </Footer>
-
-
-                {this.state.isDropdownExchange && <View style={styles.CryptoModal}>
-
-                    <Button style={styles.CryptoModalButton}
-                        onPress={() => {
-                            this.setState({
-                                isDropdownExchange: false,
-                                dorpdownExchange: {
-                                    text: 'Bitcoin',
-                                    img: require('../assets/images/crypto-icon1.png')
-                                }
-                            })
-                        }}
-                    >
-                        <Image style={styles.CryptoModalIcon} source={require('../assets/images/crypto-icon1.png')} />
-                        <Text style={styles.CryptoModalButtonText}>Bitcoin</Text>
-                    </Button>
-
-                    <Button style={styles.CryptoModalButton}
-                        onPress={() => {
-                            this.setState({
-                                isDropdownExchange: false,
-                                dorpdownExchange: {
-                                    text: 'Ethereum',
-                                    img: require('../assets/images/crypto-icon2.png')
-                                }
-                            })
-                        }}
-                    >
-                        <Image style={styles.CryptoModalIcon} source={require('../assets/images/crypto-icon2.png')} />
-                        <Text style={styles.CryptoModalButtonText}>Ethereum</Text>
-                    </Button>
-
-                    <Button style={styles.CryptoModalButton}
-                        onPress={() => {
-                            this.setState({
-                                isDropdownExchange: false,
-                                dorpdownExchange: {
-                                    text: 'Dogecoin',
-                                    img: require('../assets/images/crypto-icon3.png')
-                                }
-                            })
-                        }}
-                    >
-                        <Image style={styles.CryptoModalIcon} source={require('../assets/images/crypto-icon3.png')} />
-                        <Text style={styles.CryptoModalButtonText}>Dogecoin</Text>
-                    </Button>
-
-                    <Button style={styles.CryptoModalButton}
-                        onPress={() => {
-                            this.setState({
-                                isDropdownExchange: false,
-                                dorpdownExchange: {
-                                    text: 'NEO',
-                                    img: require('../assets/images/crypto-icon4.png')
-                                }
-                            })
-                        }}
-                    >
-                        <Image style={styles.CryptoModalIcon} source={require('../assets/images/crypto-icon4.png')} />
-                        <Text style={styles.CryptoModalButtonText}>NEO</Text>
-                    </Button>
-
-                    <Button style={styles.CryptoModalButton}
-                        onPress={() => {
-                            this.setState({
-                                isDropdownExchange: false,
-                                dorpdownExchange: {
-                                    text: 'Dashcoin',
-                                    img: require('../assets/images/crypto-icon5.png')
-                                }
-                            })
-                        }}
-                    >
-                        <Image style={styles.CryptoModalIcon} source={require('../assets/images/crypto-icon5.png')} />
-                        <Text style={styles.CryptoModalButtonText}>Dashcoin</Text>
-                    </Button>
-
-                    <Button style={styles.CryptoModalButton}
-                        onPress={() => {
-                            this.setState({
-                                isDropdownExchange: false,
-                                dorpdownExchange: {
-                                    text: 'Litecoin',
-                                    img: require('../assets/images/crypto-icon7.png')
-                                }
-                            })
-                        }}
-                    >
-                        <Image style={styles.CryptoModalIcon} source={require('../assets/images/crypto-icon7.png')} />
-                        <Text style={styles.CryptoModalButtonText}>Litecoin</Text>
-                    </Button>
-
-
-                </View>
-
-                }
-
-                {this.state.isDropdownReceive && <View style={styles.CryptoModal}>
-
-                    <Button style={styles.CryptoModalButton}
-                        onPress={() => {
-                            this.setState({
-                                isDropdownReceive: false,
-                                dorpdownReceive: {
-                                    text: 'Bitcoin',
-                                    img: require('../assets/images/crypto-icon1.png')
-                                }
-                            })
-                        }}
-                    >
-                        <Image style={styles.CryptoModalIcon} source={require('../assets/images/crypto-icon1.png')} />
-                        <Text style={styles.CryptoModalButtonText}>Bitcoin</Text>
-                    </Button>
-
-                    <Button style={styles.CryptoModalButton}
-                        onPress={() => {
-                            this.setState({
-                                isDropdownReceive: false,
-                                dorpdownReceive: {
-                                    text: 'Ethereum',
-                                    img: require('../assets/images/crypto-icon2.png')
-                                }
-                            })
-                        }}
-                    >
-                        <Image style={styles.CryptoModalIcon} source={require('../assets/images/crypto-icon2.png')} />
-                        <Text style={styles.CryptoModalButtonText}>Ethereum</Text>
-                    </Button>
-
-                    <Button style={styles.CryptoModalButton}
-                        onPress={() => {
-                            this.setState({
-                                isDropdownReceive: false,
-                                dorpdownReceive: {
-                                    text: 'Dogecoin',
-                                    img: require('../assets/images/crypto-icon3.png')
-                                }
-                            })
-                        }}
-                    >
-                        <Image style={styles.CryptoModalIcon} source={require('../assets/images/crypto-icon3.png')} />
-                        <Text style={styles.CryptoModalButtonText}>Dogecoin</Text>
-                    </Button>
-
-                    <Button style={styles.CryptoModalButton}
-                        onPress={() => {
-                            this.setState({
-                                isDropdownReceive: false,
-                                dorpdownReceive: {
-                                    text: 'NEO',
-                                    img: require('../assets/images/crypto-icon4.png')
-                                }
-                            })
-                        }}
-                    >
-                        <Image style={styles.CryptoModalIcon} source={require('../assets/images/crypto-icon4.png')} />
-                        <Text style={styles.CryptoModalButtonText}>NEO</Text>
-                    </Button>
-
-                    <Button style={styles.CryptoModalButton}
-                        onPress={() => {
-                            this.setState({
-                                isDropdownReceive: false,
-                                dorpdownReceive: {
-                                    text: 'Dashcoin',
-                                    img: require('../assets/images/crypto-icon5.png')
-                                }
-                            })
-                        }}
-                    >
-                        <Image style={styles.CryptoModalIcon} source={require('../assets/images/crypto-icon5.png')} />
-                        <Text style={styles.CryptoModalButtonText}>Dashcoin</Text>
-                    </Button>
-
-                    <Button style={styles.CryptoModalButton}
-                        onPress={() => {
-                            this.setState({
-                                isDropdownReceive: false,
-                                dorpdownReceive: {
-                                    text: 'Litecoin',
-                                    img: require('../assets/images/crypto-icon7.png')
-                                }
-                            })
-                        }}
-                    >
-                        <Image style={styles.CryptoModalIcon} source={require('../assets/images/crypto-icon7.png')} />
-                        <Text style={styles.CryptoModalButtonText}>Litecoin</Text>
-                    </Button>
-
-
-                </View>
-
-                }
                 {/* Footer End */}
-            </Container>
+                { this.state.isDropdownExchange && <View style={styles.CryptoModal}>
+                    { dropdownExchange }
+                </View>
+                }
 
+                { this.state.isDropdownReceive && <View style={styles.CryptoModal}>
+                    { dropdownReceive }
+                </View>
+                }
+            </Container>
         );
     }
 }
 
 const styles = StyleSheet.create({
-
     container: { flex: 1, backgroundColor: "#fff" },
     backgroundImage: { width: "100%", height: 100, resizeMode: 'cover', flexDirection: 'row', justifyContent: "space-between" },
-    PageTitleBox: { paddingTop: Platform.OS === 'ios' ? 30 : 36, },
+    PageTitleBox: { paddingTop: 36, },
     PageTitle: { textAlign: "center", color: "#fff", fontSize: 20, fontWeight: "600", },
     SubPageTitle: { textAlign: "center", color: "#fff", fontSize: 14 },
-    rightbutton: { marginLeft: 20, marginTop: Platform.OS === 'ios' ? 40 : 45 },
-    leftbutton: { marginRight: 20, marginTop: Platform.OS === 'ios' ? 40 : 45 },
+    rightbutton: { marginLeft: 20, marginTop: 45 },
+    leftbutton: { marginRight: 20, marginTop: 45 },
     ScrollViewContainer: { paddingTop: 30, paddingLeft: 20, paddingRight: 20, },
     BTCGrid: { marginBottom: 30, },
     BTCTextRow: { flexDirection: 'row', justifyContent: "space-between", marginBottom: 15, },
@@ -357,7 +284,7 @@ const styles = StyleSheet.create({
     ChangellyText2: { color: "#333333", fontSize: 16, lineHeight: 26, marginBottom: 20, fontWeight: "600", },
     ColTitle: { color: "#757575", fontSize: 16, letterSpacing: 0.25, width: "100%", marginBottom: 5, },
     DownArrow: { color: "#757575", fontSize: 24, marginLeft: -5, marginTop: -2 },
-    colPicker: { padding: 0, justifyContent: "flex-start", margin: 0, alignItems: "flex-start", textAlign: "left", width: "100%", borderWidth: 0, marginLeft: Platform.OS === 'ios' ? -15 : -8, },
+    colPicker: { padding: 0, justifyContent: "flex-start", margin: 0, alignItems: "flex-start", textAlign: "left", width: "100%", borderWidth: 0, marginLeft: -8, },
     SelectGrid: { marginBottom: 25, },
     PoweredGrid: { marginBottom: 80, },
     PoweredRow: { flexDirection: 'row', justifyContent: "space-between", },
@@ -365,7 +292,7 @@ const styles = StyleSheet.create({
     PoweredColRight: { textAlign: "right", lineHeight: 50, },
     PoweredText: { color: "#666666", fontSize: 16, marginRight: 15, },
     PoweredButton: { height: 50, width: 100, borderRadius: 8, backgroundColor: "#ebebeb", borderWidth: 1, borderColor: "#fff", marginLeft: "auto", },
-    PoweredButtonText: { lineHeight: Platform.OS === 'ios' ? 38 : 45, textAlign: "center", color: "#2c32b2", fontSize: 16, letterSpacing: 0.50, },
+    PoweredButtonText: { lineHeight: 45, textAlign: "center", color: "#2c32b2", fontSize: 16, letterSpacing: 0.50, },
     Tabbackground: { display: "flex", flexDirection: 'row', width: "100%", resizeMode: 'cover', padding: 0, },
     TabButton: { width: "25%", height: "100%", padding: 0, borderRadius: 0, backgroundColor: "transparent" },
     tabBarActiveTextColor: { backgroundColor: "#fff" },

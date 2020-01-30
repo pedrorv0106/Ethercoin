@@ -1,210 +1,167 @@
 import React, { Component } from 'react';
 import { Platform, StyleSheet, Image, View, ImageBackground, TouchableOpacity, ScrollView } from 'react-native';
 import { Container, Footer, FooterTab, Button, Text, Row, Grid, Col  } from 'native-base';
+import MainStore from '../appstores/MainStore';
 
 export default class LandingComponent extends Component {
   static navigationOptions = {
     header: null,
   };
-  render() {
 
+  state = {
+    coins: null,
+    balance: 0
+  }
+
+  async componentWillMount() {
+    this.loadCoinData()
+  }
+  async loadCoinData(){
+    let coins = await MainStore.appState.appCoinsStore.getCoinFromDS()
+    coins = coins.filter(c => c.isAdded === true)
+    let balance = 0
+    coins.forEach(c => {
+      balance = balance + c.gbpPrice * c.balance
+    })
+    this.setState({ coins, balance })
+    try {
+      const response = await fetch('https://api.coinmarketcap.com/v2/ticker/?limit=100&convert=GBP')
+      const posts = await response.json()
+      for(var k in posts.data) {
+        let index = this.getIndexCoin(posts.data[k].symbol)
+        if(index >= 0){
+          coins[index].gbpPrice = posts.data[k].quotes.GBP.price
+          this.setState({ coins })
+        }
+      }
+    } catch (e) { }
+  }
+  
+  getIndexCoin(symbol){
+    const { coins } = this.state
+    let ret = -1
+    coins.forEach((c, index) =>{
+      if(c.token_symbol === symbol){
+        ret = index
+      }
+    })
+    return ret;
+  }
+
+  renderList(){
+    let { coins } = this.state
+
+    let contents = []
+    if(coins !== null ) {
+      coins.forEach((c, index) =>{
+        let iconUrl
+        let cost = c.gbpPrice * c.balance;
+        if(c.token_name === 'Bitcoin'){
+          iconUrl = require('../assets/images/crypto-icon1.png')
+        } else if(c.token_name === 'Ethereum'){
+          iconUrl = require('../assets/images/crypto-icon2.png')
+        } else {
+          iconUrl = require('../assets/images/crypto-icon3.png')
+        }
+        item = <Row key={c.token_name} style={styles.CryptoListRow} 
+                onPress={() => this.props.navigation.navigate('CoinDetail', {coins, selectedCoin: c})}>
+          <Col style={styles.CryptoList}>
+            <Image style={styles.CryptoListImage} source={iconUrl} />
+            <Grid style={styles.ListContentBox}>
+              <Col style={styles.ListContentLeft}>
+                <Text style={styles.ListContentTop}>{c.token_name}</Text>
+                <Text style={styles.ListContentBottom}>= £ {cost.toFixed(2)}</Text>
+              </Col>
+              <Col style={styles.ListContentRight}>
+                <Text style={styles.ListRightTop}>{c.gbpPrice.toFixed(4)} GBP</Text>
+                <Text style={styles.ListRightBottom}>{c.balance} {c.token_symbol}</Text>
+              </Col>
+            </Grid>
+          </Col>
+        </Row>
+
+        contents.push(item)
+      })
+    }
+    return contents
+  }
+
+  render() {
+    const listContents = this.renderList()
+    const { balance } = this.state
     return (
       <Container>
         <ScrollView style={ styles.ScrollViewContainer}>
-        <View style={ styles.container }>
-        {/* Header start */}
-        <ImageBackground source={require('../assets/images/inner-header-bg2.jpg')} style={styles.backgroundImage}>            
-
-          <View style={styles.HeaderTop}>
-            <TouchableOpacity onPress={() => this.props.navigation.navigate('DApps')}>
-              <Image style={styles.rightbutton} source={require('../assets/images/icon1.png')} />
-            </TouchableOpacity>
-            <Text style={ styles.PageTitle}>Ether Coin</Text>      
-            <TouchableOpacity onPress={() => this.props.navigation.navigate('Settings')}>
-              <Image style={styles.leftbutton} source={require('../assets/images/icon2.png')} />
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.HeaderBottom}>
-              <Text style={styles.BalanceTitle}>BALANCE</Text>
-              <View style={styles.BalanceValue}>
-                <Text style={styles.BalanceValueImage}><Image style={styles.DownIcon} source={require('../assets/images/down.png')} /></Text>
-                <Text style={styles.BalanceValueText}> £ 1428.00</Text>
+          <View style={ styles.container }>
+            {/* Header start */}
+            <ImageBackground source={require('../assets/images/inner-header-bg2.jpg')} style={styles.backgroundImage}>            
+              <View style={styles.HeaderTop}>
+                <TouchableOpacity onPress={() => this.props.navigation.navigate('DApps')}>
+                  <Image style={styles.rightbutton} source={require('../assets/images/icon1.png')} />
+                </TouchableOpacity>
+                <Text style={ styles.PageTitle}>Ether Coin</Text>      
+                <TouchableOpacity onPress={() => this.props.navigation.navigate('Settings')}>
+                  <Image style={styles.leftbutton} source={require('../assets/images/icon2.png')} />
+                </TouchableOpacity>
               </View>
-          </View>
 
-        </ImageBackground>
-        {/* Header End */}
-       
-          {/* button */}
-          <View style={styles.HomeButtonBox}>
-          <Button style={styles.HomeButton} onPress={() => this.props.navigation.navigate('BuyCrypto')}>
-            <ImageBackground source={require('../assets/images/button-bg.png')} style={styles.HomeButtonBackground}>
-              <Text style={styles.HomeButtonText}>BUY CRYPTO</Text>
+              <View style={styles.HeaderBottom}>
+                  <Text style={styles.BalanceTitle}>BALANCE</Text>
+                  <View style={styles.BalanceValue}>
+                    <Text style={styles.BalanceValueImage}><Image style={styles.DownIcon} source={require('../assets/images/down.png')} /></Text>
+                    <Text style={styles.BalanceValueText}> £ {balance.toFixed(2)}</Text>
+                  </View>
+              </View>
             </ImageBackground>
-          </Button>
+            {/* Header End */}
+          
+            {/* button */}
+            <View style={styles.HomeButtonBox}>
+              <Button style={styles.HomeButton} onPress={() => this.props.navigation.navigate('BuyCrypto')}>
+                <ImageBackground source={require('../assets/images/button-bg.png')} style={styles.HomeButtonBackground}>
+                  <Text style={styles.HomeButtonText}>BUY CRYPTO</Text>
+                </ImageBackground>
+              </Button>
 
-          <Button style={styles.HomeButton} onPress={() => this.props.navigation.navigate('AddCoinToken')}>
-            <ImageBackground source={require('../assets/images/button-bg.png')} style={styles.HomeButtonBackground}>
-              <Text style={styles.HomeButtonText}>ADD COIN</Text>
-            </ImageBackground>
-          </Button>
+              <Button style={styles.HomeButton} onPress={() => this.props.navigation.navigate('AddCoinToken', {
+                onGoBack: () => this.loadCoinData(),
+              })}>
+                <ImageBackground source={require('../assets/images/button-bg.png')} style={styles.HomeButtonBackground}>
+                  <Text style={styles.HomeButtonText}>ADD COIN</Text>
+                </ImageBackground>
+              </Button>
+            </View>
+            {/* button */}
+          
+            {/* Grid start */}
+            <Grid style={styles.CryptoListBox}>
+              {/* Crypto List */}
+              { listContents }
+            </Grid>
+            {/* Grid End */}
           </View>
-          {/* button */}
-
-          
-         
-
-       
-{/* Grid start */}
-          <Grid style={styles.CryptoListBox}>
-
-            {/* Crypto List */}
-            <Row style={styles.CryptoListRow} onPress={() => this.props.navigation.navigate('CoinDetail')}>
-            <Col style={styles.CryptoList}>
-           
-              <Image style={styles.CryptoListImage} source={require('../assets/images/crypto-icon1.png')} />
-              <Grid style={styles.ListContentBox}>
-
-                  <Col style={styles.ListContentLeft}>
-                    <Text style={styles.ListContentTop}>Bitcoin</Text>
-                    <Text style={styles.ListContentBottom}>= £ 4734.27</Text>
-                  </Col>
-
-                  <Col style={styles.ListContentRight}>
-                    <Text style={styles.ListRightTop}>108.06 GBP</Text>
-                    <Text style={styles.ListRightBottom}>0.0074 BTC</Text>
-                  </Col>
-
-              </Grid>
-            </Col>
-            </Row>
-            {/* Crypto List */}
-
-            {/* Crypto List */}
-            <Row style={styles.CryptoListRow} onPress={() => this.props.navigation.navigate('CoinDetail')}>
-            <Col style={styles.CryptoList}>
-           
-              <Image style={styles.CryptoListImage} source={require('../assets/images/crypto-icon2.png')} />
-              <Grid style={styles.ListContentBox}>
-
-                  <Col style={styles.ListContentLeft}>
-                    <Text style={styles.ListContentTop}>Ethereum</Text>
-                    <Text style={styles.ListContentBottom}>= £ 328.41</Text>
-                  </Col>
-
-                  <Col style={styles.ListContentRight}>
-                    <Text style={styles.ListRightTop}>44.59 GBP</Text>
-                    <Text style={styles.ListRightBottom}>0.2470 ETH</Text>
-                  </Col>
-
-              </Grid>
-
-            </Col>
-            </Row>
-            {/* Crypto List */}
-
-
-            {/* Crypto List */}
-            <Row style={styles.CryptoListRow} onPress={() => this.props.navigation.navigate('CoinDetail')}>
-            <Col style={styles.CryptoList}>
-           
-              <Image style={styles.CryptoListImage} source={require('../assets/images/crypto-icon3.png')} />
-              <Grid style={styles.ListContentBox}>
-
-                  <Col style={styles.ListContentLeft}>
-                    <Text style={styles.ListContentTop}>Dogecoin</Text>
-                    <Text style={styles.ListContentBottom}>= £ 4734.27</Text>
-                  </Col>
-
-                  <Col style={styles.ListContentRight}>
-                    <Text style={styles.ListRightTop}>108.06 GBP</Text>
-                    <Text style={styles.ListRightBottom}>0.0074 DOGE</Text>
-                  </Col>
-
-              </Grid>
-
-            </Col>
-            </Row>
-            {/* Crypto List */}
-
-
-            {/* Crypto List */}
-            <Row style={styles.CryptoListRow} onPress={() => this.props.navigation.navigate('CoinDetail')}>
-            <Col style={styles.CryptoList}>
-           
-              <Image style={styles.CryptoListImage} source={require('../assets/images/crypto-icon4.png')} />
-              <Grid style={styles.ListContentBox}>
-
-                  <Col style={styles.ListContentLeft}>
-                    <Text style={styles.ListContentTop}>NEO</Text>
-                    <Text style={styles.ListContentBottom}>= £ 4734.27</Text>
-                  </Col>
-
-                  <Col style={styles.ListContentRight}>
-                    <Text style={styles.ListRightTop}>42.06 GBP</Text>
-                    <Text style={styles.ListRightBottom}>0.1254 NEO</Text>
-                  </Col>
-
-              </Grid>
-
-            </Col>
-            </Row>
-            {/* Crypto List */}
-
-
-            {/* Crypto List */}
-            <Row style={styles.CryptoListRow} onPress={() => this.props.navigation.navigate('CoinDetail')}>
-            <Col style={styles.CryptoList}>
-           
-              <Image style={styles.CryptoListImage} source={require('../assets/images/crypto-icon5.png')} />
-              <Grid style={styles.ListContentBox}>
-
-                  <Col style={styles.ListContentLeft}>
-                    <Text style={styles.ListContentTop}>Dashcoin</Text>
-                    <Text style={styles.ListContentBottom}>= £ 4734.27</Text>
-                  </Col>
-
-                  <Col style={styles.ListContentRight}>
-                    <Text style={styles.ListRightTop}>108.06 GBP</Text>
-                    <Text style={styles.ListRightBottom}>2.0074 DASH</Text>
-                  </Col>
-
-              </Grid>
-
-            </Col>
-            </Row>
-            {/* Crypto List */}
-
-          </Grid>
-
-          {/* Grid End */}
-
-          
-          
-
-        </View>
         </ScrollView>
+
         {/* Footer start */}
         <Footer style={styles.Footer}>
           <FooterTab style={styles.FooterTab}>
-          <ImageBackground source={require('../assets/images/tab-bg.jpg')} style={styles.Tabbackground}>
-            <Button style={styles.TabButton} onPress={() => this.props.navigation.navigate('Main')}>
-              <Image style={styles.TabButtonImage} source={require('../assets/images/icon3.png')} />
-              <Text style={styles.TabButtonText}>WALLET</Text>
-            </Button>
-            <Button style={styles.TabButton} onPress={() => this.props.navigation.navigate('CoinDetailReceive')}>
-            <Image style={styles.TabButtonImage} source={require('../assets/images/icon4.png')} />
-              <Text style={styles.TabButtonText}>RECEIVE</Text>
-            </Button>
-            <Button style={styles.TabButton} onPress={() => this.props.navigation.navigate('CoinDetailSend')}>
-            <Image style={styles.TabButtonImage} source={require('../assets/images/icon5.png')} />
-              <Text style={styles.TabButtonText}>SEND</Text>
-            </Button>
-            <Button style={styles.TabButton} onPress={() => this.props.navigation.navigate('ShapeshiftExchange')}>
-            <Image style={styles.TabButtonImage} source={require('../assets/images/icon6.png')} />
-              <Text style={styles.TabButtonText}>EXCHANGE</Text>
-            </Button>
+            <ImageBackground source={require('../assets/images/tab-bg.jpg')} style={styles.Tabbackground}>
+              <Button style={styles.TabButton} onPress={() => this.props.navigation.navigate('Main')}>
+                <Image style={styles.TabButtonImage} source={require('../assets/images/icon3.png')} />
+                <Text style={styles.TabButtonText}>WALLET</Text>
+              </Button>
+              <Button style={styles.TabButton} onPress={() => this.props.navigation.navigate('CoinDetailReceive')}>
+              <Image style={styles.TabButtonImage} source={require('../assets/images/icon4.png')} />
+                <Text style={styles.TabButtonText}>RECEIVE</Text>
+              </Button>
+              <Button style={styles.TabButton} onPress={() => this.props.navigation.navigate('CoinDetailSend')}>
+              <Image style={styles.TabButtonImage} source={require('../assets/images/icon5.png')} />
+                <Text style={styles.TabButtonText}>SEND</Text>
+              </Button>
+              <Button style={styles.TabButton} onPress={() => this.props.navigation.navigate('ShapeshiftExchange')}>
+              <Image style={styles.TabButtonImage} source={require('../assets/images/icon6.png')} />
+                <Text style={styles.TabButtonText}>EXCHANGE</Text>
+              </Button>
             </ImageBackground>
           </FooterTab>
         </Footer>
@@ -215,14 +172,11 @@ export default class LandingComponent extends Component {
   }
 }
 
-
-
 const styles = StyleSheet.create({
-
   container:{ flex: 1, backgroundColor:"#fff"},
   backgroundImage: { width:"100%", height:200, resizeMode: 'cover',},
   HeaderTop:{ flexDirection: 'row', justifyContent:"space-between", },
-  PageTitle:{ textAlign:"center", lineHeight:Platform.OS === 'ios' ? 90 : 120, color:"#fff", fontSize:20, fontWeight:"700", fontFamily:"LatoRegular", },
+  PageTitle:{ textAlign:"center", lineHeight: 120, color:"#fff", fontSize:20, fontWeight:"700", fontFamily:"LatoRegular", },
   rightbutton:{ marginLeft:20, marginTop:40},
   leftbutton:{ marginRight:20, marginTop:40},
   HeaderBottom:{ textAlign:"center",},
@@ -251,5 +205,4 @@ const styles = StyleSheet.create({
   ListRightBottom:{ textAlign:"right", color:"#000000", fontSize:13, fontFamily:"LatoRegular", },
   ListContentTop:{  color:"#000000", fontSize:18, marginBottom:3, fontFamily:"LatoRegular",},
   ListContentBottom:{ color:"#000000", fontSize:13, fontFamily:"LatoRegular", },
-  
-  });
+});

@@ -3,7 +3,6 @@ import { Platform, StyleSheet, View, ImageBackground, Alert, TouchableOpacity, I
 import { Input, Text } from 'native-base';
 import MainStore from '../appstores/MainStore';
 import CreateWalletStore from '../appstores/CreateWalletStore';
-import { chainNames } from '../Utils/WalletAddresses';
 
 export default class RecoveryStepTwoComponent extends Component {
   static navigationOptions = {
@@ -17,7 +16,7 @@ export default class RecoveryStepTwoComponent extends Component {
     passphraseInputValue4: '',
   }
   
-  onBackupNow = () =>{
+  onBackupNow = async () =>{
     const {passphraseInputValue1, passphraseInputValue2, passphraseInputValue3, passphraseInputValue4} = this.state;
     const listKeywordRandom = MainStore.backupStore.obj.listKeywordRandom;
 
@@ -26,7 +25,7 @@ export default class RecoveryStepTwoComponent extends Component {
       && passphraseInputValue3 === listKeywordRandom[2]
       && passphraseInputValue4 === listKeywordRandom[3]) {        
         const createWalletStore = new CreateWalletStore();
-        createWalletStore.handleCreateWallet();
+        await createWalletStore.handleCreateWallet();
 
         this.props.navigation.navigate('Main')
     } else {

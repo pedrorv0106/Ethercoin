@@ -1,8 +1,8 @@
 import BtcWallet from './Wallet.btc'
 import EthWallet from './Wallet'
-import Keystore from '../../../Libs/react-native-golden-keystore'
+import Keystore from '../../../libs/react-native-golden-keystore'
 import WalletDS from '../../datasource/WalletDS'
-import GetAddress, { chainNames } from '../../../Utils/WalletAddresses'
+import GetAddress, { chainNames } from '../../../utils/walletaddresses'
 import { ethers } from 'ethers'
 
 export const generateNew = async (secureDS, title, indexETH=0, indexBTC=0, pathETH, pathBTC, network = 'mainnet') => {

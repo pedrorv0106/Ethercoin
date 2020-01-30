@@ -1,10 +1,10 @@
 import { observable, action, computed } from 'mobx'
 import BigNumber from 'bignumber.js'
 import Wallet from './Wallet'
-import Keystore from '../../../Libs/react-native-golden-keystore'
+import Keystore from '../../../libs/react-native-golden-keystore'
 import MainStore from '../../MainStore'
 import WalletTokenBTC from '../WalletToken.btc'
-import GetAddress, { chainNames } from '../../../Utils/WalletAddresses'
+import GetAddress, { chainNames } from '../../../utils/walletaddresses'
 
 const defaultObjWallet = {
   title: '',

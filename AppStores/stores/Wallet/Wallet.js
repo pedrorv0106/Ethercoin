@@ -2,11 +2,11 @@ import { observable, action, computed } from 'mobx'
 import chunk from 'lodash.chunk'
 import BigNumber from 'bignumber.js'
 import WalletToken from '../WalletToken'
-import Keystore from '../../../Libs/react-native-golden-keystore'
+import Keystore from '../../../libs/react-native-golden-keystore'
 import WalletDS from '../../datasource/WalletDS'
-import GetAddress, { chainNames } from '../../../Utils/WalletAddresses'
+import GetAddress, { chainNames } from '../../../utils/walletaddresses'
 import MainStore from '../../MainStore'
-import Collectible from '../Collectible'
+
 // Object Wallet:
 // title: 'I am cold wallet',
 // address: '0xabc1232432bbfe',

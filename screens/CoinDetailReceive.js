@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import { Platform, StyleSheet, Image, View, ImageBackground, TouchableOpacity, ScrollView } from 'react-native';
 import { Container, Footer, FooterTab, Button,  Icon, Grid, Col, Text, Row, Tabs, Tab,  TabHeading, Picker  } from 'native-base';
+import MainStore from '../appstores/MainStore';
 
 import Tab1 from './tabOne';
 import Tab2 from './tabTwo';
 import Tab3 from './tabthree';
 
 export default class CoinDetailReceiveComponent extends Component {
-
   static navigationOptions = {
     header: null,
   };
@@ -15,138 +15,158 @@ export default class CoinDetailReceiveComponent extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selected: "key1"
+      coins: null,
+      selectedCoin: null
     };
   }
-  onValueChange(value){
-    this.setState({
-      selected: value
-    });
+
+  async componentWillMount() {
+    this.loadCoinData()
+  }
+  async loadCoinData(){
+    let coins = await MainStore.appState.appCoinsStore.getCoinFromDS()
+    coins = coins.filter(c => c.isAdded === true)
+    this.setState({ coins, selectedCoin:coins[0] })
+    try {
+      const response = await fetch('https://api.coinmarketcap.com/v2/ticker/?limit=100&convert=GBP')
+      const posts = await response.json()
+      for(var k in posts.data) {
+        let index = this.getIndexCoin(posts.data[k].symbol)
+        if(index >= 0){
+          coins[index].gbpPrice = posts.data[k].quotes.GBP.price
+          this.setState({ coins })
+        }
+      }
+    } catch (e) { }
   }
 
-
+  onValueChange(coin){
+    this.setState({
+      selectedCoin: coin
+    });
+  }
+  
+  renderPickerItems(){
+    const pickerItems = []
+    const {coins} = this.state
+    if(coins != null){
+      coins.forEach(c => {
+        const item = <Picker.Item key={c.token_symbol} label={c.token_name} value={c} />
+        pickerItems.push(item)
+      })
+    }
+   return pickerItems
+  }
+  
   render() {
-    
-const {goBack} = this.props.navigation;
+    const {goBack} = this.props.navigation;
+    const { selectedCoin } = this.state
+    const pickerItems = this.renderPickerItems()
+    let cost = 0
+    let balance = 0
+    let symbol = ''
+    let address = ''
+    if(selectedCoin != null){
+      cost = selectedCoin.gbpPrice * selectedCoin.balance;
+      balance = selectedCoin.balance
+      symbol = selectedCoin.token_symbol
+      address = selectedCoin.wallet_address
+    }
+
     return (
       <Container>
         <ScrollView style={ styles.ScrollViewContainer}>
-        <View style={ styles.container }>
-
-        <ImageBackground source={require('../assets/images/inner-header-bg2.jpg')} style={styles.backgroundImage}>            
-
-          <View style={styles.HeaderTop}>
-            <TouchableOpacity  onPress={() => goBack()}>
-              <Image style={styles.rightbutton} source={require('../assets/images/backbutton.png')} />
-            </TouchableOpacity>
-            <View style={ styles.HeaderPicker}>
-            <Picker
-                mode="dropdown"
-                iosHeader="Select your SIM"
-                iosIcon={<Icon name="caret-down" type="FontAwesome" style={styles.DownArrow} />}
-                style={ styles.PageTitle}
-                selectedValue={this.state.selected}
-                onValueChange={this.onValueChange.bind(this)}
-                textStyle={{ fontSize:18,color:"#fff" }}
-                >                
-                <Picker.Item label="GBP" value="key0" />
-                <Picker.Item label="BTC" value="key1" />
-                
-            </Picker> 
-            </View>
-            <TouchableOpacity onPress={this._onPressButton}>
-              <Image style={styles.leftbutton} source={require('../assets/images/icon2.png')} />
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.HeaderBottom}>
-              <Text style={styles.BalanceTitle}>0.0074 BTC</Text>
-              <View style={styles.BalanceValue}>
-                <Text style={styles.BalanceValueImage}><Image style={styles.DownIcon} source={require('../assets/images/down2.png')} /></Text>
-                <Text style={styles.BalanceValueText}> £ 4749.80</Text>
+          <View style={ styles.container }>
+            <ImageBackground source={require('../assets/images/inner-header-bg2.jpg')} style={styles.backgroundImage}>            
+              <View style={styles.HeaderTop}>
+                <TouchableOpacity  onPress={() => goBack()}>
+                  <Image style={styles.rightbutton} source={require('../assets/images/backbutton.png')} />
+                </TouchableOpacity>
+                <View style={ styles.HeaderPicker}>
+                  <Picker
+                    mode="dropdown"
+                    iosHeader="Select your SIM"
+                    iosIcon={<Icon name="caret-down" type="FontAwesome" style={styles.DownArrow} />}
+                    style={ styles.PageTitle}
+                    selectedValue={this.state.selectedCoin}
+                    onValueChange={this.onValueChange.bind(this)}
+                    textStyle={{ fontSize:18,color:"#fff" }}
+                    >                
+                    { pickerItems }
+                  </Picker> 
+                </View>
+                <TouchableOpacity onPress={this._onPressButton}>
+                  <Image style={styles.leftbutton} source={require('../assets/images/icon2.png')} />
+                </TouchableOpacity>
               </View>
+              <View style={styles.HeaderBottom}>
+                <Text style={styles.BalanceTitle}>{balance.toFixed(4)} {symbol}</Text>
+                <View style={styles.BalanceValue}>
+                  <Text style={styles.BalanceValueImage}><Image style={styles.DownIcon} source={require('../assets/images/down2.png')} /></Text>
+                  <Text style={styles.BalanceValueText}> £ {cost.toFixed(2)}</Text>
+                </View>
+              </View>
+            </ImageBackground>
+            <View style={styles.BTCContent}>
+              <Grid style={styles.BTCGrid}>
+                <Row style={styles.BTCTextRow}>
+                  <Col><Text style={styles.BTCPayText}>My Address</Text></Col>
+                </Row>
+                <Row>
+                  <Col><Text style={styles.AddText}>{ address }</Text></Col>          
+                </Row>
+              </Grid>
+              <Grid>
+              <Row>
+                <Col>
+                  <Tabs style={styles.BTCTab} tabBarUnderlineStyle={{ backgroundColor:Platform.OS === 'ios' ? "#4a35ac" : "#9b3c9c", }}>
+                    <Tab style={styles.BTCTabCol} heading={ <TabHeading><Text style={styles.BTCTabColText}>Default</Text></TabHeading>}><Tab1 coin={selectedCoin} /></Tab>
+                    <Tab style={styles.BTCTabCol} heading={ <TabHeading><Text style={styles.BTCTabColText}>Compatibility</Text></TabHeading>}><Tab2 coin={selectedCoin}/></Tab>
+                    <Tab style={styles.BTCTabCol} heading={ <TabHeading><Text style={styles.BTCTabColText}>Legacy</Text></TabHeading>}><Tab3 coin={selectedCoin}/></Tab>
+                  </Tabs>
+                </Col>
+              </Row>
+            </Grid>        
+            </View>
           </View>
-
-        </ImageBackground>
-
-        <View style={styles.BTCContent}>
-        <Grid style={styles.BTCGrid}>
-          <Row style={styles.BTCTextRow}>
-            <Col><Text style={styles.BTCPayText}>My Address</Text></Col>
-          </Row>
-          <Row>
-            <Col><Text style={styles.AddText}>bclq  0d59  5vlp  5pql  pc3e9  ax1f     whiq   41d7   rh2n   kyfi</Text></Col>          
-          </Row>
-        </Grid>
-
-        <Grid>
-          <Row>
-            <Col>
-                <Tabs style={styles.BTCTab} tabBarUnderlineStyle={{ backgroundColor:Platform.OS === 'ios' ? "#4a35ac" : "#9b3c9c", }}>
-                  <Tab style={styles.BTCTabCol} heading={ <TabHeading><Text style={styles.BTCTabColText}>Default</Text></TabHeading>}><Tab1 /></Tab>
-                  <Tab style={styles.BTCTabCol} heading={ <TabHeading><Text style={styles.BTCTabColText}>Compatibility</Text></TabHeading>}><Tab2 /></Tab>
-                  <Tab style={styles.BTCTabCol} heading={ <TabHeading><Text style={styles.BTCTabColText}>Legacy</Text></TabHeading>}><Tab3 /></Tab>
-                </Tabs>
-             </Col>
-            </Row>
-          </Grid>        
-        
-
-        
-
-        </View>
-        
-       
-         
-        
-          
-          
-
-        </View>
         </ScrollView>
-
-        
-
-        
         {/* Footer start */}
         <Footer style={styles.Footer}>
           <FooterTab style={styles.FooterTab}>
-          <ImageBackground source={require('../assets/images/tab-bg.jpg')} style={styles.Tabbackground}>
-            <Button style={styles.TabButton} onPress={() => this.props.navigation.navigate('Main')}>
-              <Image style={styles.TabButtonImage} source={require('../assets/images/icon3.png')} />
-              <Text style={styles.TabButtonText}>WALLET</Text>
-            </Button>
-            <Button style={styles.TabButton} onPress={() => this.props.navigation.navigate('CoinDetailReceive')}>
-            <Image style={styles.TabButtonImage} source={require('../assets/images/icon4.png')} />
-              <Text style={styles.TabButtonText}>RECEIVE</Text>
-            </Button>
-            <Button style={styles.TabButton} onPress={() => this.props.navigation.navigate('CoinDetailSend')}>
-            <Image style={styles.TabButtonImage} source={require('../assets/images/icon5.png')} />
-              <Text style={styles.TabButtonText}>SEND</Text>
-            </Button>
-            <Button style={styles.TabButton} onPress={() => this.props.navigation.navigate('ShapeshiftExchange')}>
-            <Image style={styles.TabButtonImage} source={require('../assets/images/icon6.png')} />
-              <Text style={styles.TabButtonText}>EXCHANGE</Text>
-            </Button>
+            <ImageBackground source={require('../assets/images/tab-bg.jpg')} style={styles.Tabbackground}>
+              <Button style={styles.TabButton} onPress={() => this.props.navigation.navigate('Main')}>
+                <Image style={styles.TabButtonImage} source={require('../assets/images/icon3.png')} />
+                <Text style={styles.TabButtonText}>WALLET</Text>
+              </Button>
+              <Button style={styles.TabButton} onPress={() => this.props.navigation.navigate('CoinDetailReceive')}>
+              <Image style={styles.TabButtonImage} source={require('../assets/images/icon4.png')} />
+                <Text style={styles.TabButtonText}>RECEIVE</Text>
+              </Button>
+              <Button style={styles.TabButton} onPress={() => this.props.navigation.navigate('CoinDetailSend')}>
+              <Image style={styles.TabButtonImage} source={require('../assets/images/icon5.png')} />
+                <Text style={styles.TabButtonText}>SEND</Text>
+              </Button>
+              <Button style={styles.TabButton} onPress={() => this.props.navigation.navigate('ShapeshiftExchange')}>
+              <Image style={styles.TabButtonImage} source={require('../assets/images/icon6.png')} />
+                <Text style={styles.TabButtonText}>EXCHANGE</Text>
+              </Button>
             </ImageBackground>
           </FooterTab>
         </Footer>
         {/* Footer End */}
-
       </Container>
     );
   }
 }
 
-
-
 const styles = StyleSheet.create({
-
   container:{ flex: 1, backgroundColor:"#fff"},
   backgroundImage: { width:"100%", height:200, resizeMode: 'cover',},
   HeaderTop:{ flexDirection: 'row', justifyContent:"space-between", },
-  HeaderPicker:{ display:"flex",  borderColor:"#fff", borderWidth:1, borderRadius:3, paddingLeft:0, paddingRight:0, marginTop:40, marginBottom:30, height:35, width:100,   }, 
-  PageTitle:{  fontFamily:"LatoRegular", lineHeight:0, width:"100%", height:"100%",  margin:Platform.OS === 'ios' ? 0 : 0, alignItems:"center", textAlign:"center", fontSize:Platform.OS === 'ios' ? 20 : 50, color:"#fff", padding:0, fontWeight:"700", },
+  HeaderPicker:{ display:"flex",  borderColor:"#fff", borderWidth:1, borderRadius:3,
+                  paddingLeft:0, paddingRight:0, marginTop:40, marginBottom:30, height:35, width:130,   }, 
+  PageTitle:{  fontFamily:"LatoRegular", lineHeight:0, width:"100%", height:"100%",  
+                  margin: 0, alignItems:"center", textAlign:"center", fontSize: 50, color:"#fff" },
   rightbutton:{ marginLeft:20, marginTop:40},
   leftbutton:{ marginRight:20, marginTop:40},
   HeaderBottom:{ textAlign:"center",},
@@ -169,6 +189,5 @@ const styles = StyleSheet.create({
   BTCGrid:{ marginBottom: 20,},
   BTCTab:{ borderColor:"#4a35ac", borderWidth:1, borderRadius:4, overflow:"hidden", marginBottom:50,  },
   BTCTabCol:{ borderRightColor:"#4a35ac", borderRightWidth:1, position:"relative", zIndex:99, backgroundColor:"#fff",  },
-  BTCTabColText:{ color:Platform.OS === 'ios' ? "#4a35ac" : "#fff", fontSize:Platform.OS === 'ios' ? 14 : 15, fontWeight:"300",},
-
-  });
+  BTCTabColText:{ color:Platform.OS === 'ios' ? "#4a35ac" : "#fff", fontSize: 15, fontWeight:"300",},
+});

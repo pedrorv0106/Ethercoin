@@ -1,4 +1,4 @@
-import KeyStore from './Libs/react-native-golden-keystore'
+import KeyStore from './libs/react-native-golden-keystore'
 
 const mnemonicIsValid = (str) => KeyStore.mnemonicIsValid(str)
   .then(isValid => console.log(isValid))
