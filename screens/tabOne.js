@@ -1,22 +1,34 @@
-import React, { Component } from 'react';
-import { StyleSheet, Text, View, Image } from 'react-native';
-import { Grid, Row, Col } from 'native-base';
+import React, { Component } from 'react'
+import { StyleSheet, Text, View, Image } from 'react-native'
+import { Grid, Row, Col } from 'native-base'
+import QRCode from 'react-native-qrcode-svg'
 
 export default class App extends Component {
+  
   render() {
     const {coin} = this.props
+    
     let symbol = ''
     let balance = 0
     let gbp = 0;
+    let address = 'default value'
     if(coin){
       symbol = coin.token_symbol
       balance = coin.balance
       gbp = coin.gbpPrice
+      address = coin.wallet_address
     }
     
     return (
       <View style={ styles.container }>
-        <Image style={styles.QrImage} source={require('../assets/images/qr.jpg')} />
+        {coin &&
+          <View style={styles.QrImage}>
+            <QRCode
+              value={address}
+              size = {200}
+              />
+          </View>
+        }
         <Grid style={styles.InfoBox}>
           <Row style={styles.InfoRow}>
             <Col style={styles.InfoCol}><Text style={styles.InfoText}>{balance.toFixed(4)} {symbol}</Text></Col>
