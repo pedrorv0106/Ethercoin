@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet, Image, View, ImageBackground, TouchableOpacity, ScrollView } from 'react-native';
-import { Container, Footer, FooterTab, Button,  Icon, Grid, Col, Text, Row, Textarea, Picker  } from 'native-base';
+import { Container, Footer, FooterTab, Button,  Icon, Grid, Col, Text, Row, Textarea, Picker,Input  } from 'native-base';
 import MainStore from '../appstores/MainStore';
 
 export default class CoinDetailSendComponent extends Component {
@@ -12,7 +12,9 @@ export default class CoinDetailSendComponent extends Component {
     super(props);
     this.state = {
       coins: null,
-      selectedCoin: null
+      selectedCoin: null,
+      btcValue: '',
+      gbpValue: ''
     };
   }
 
@@ -54,9 +56,31 @@ export default class CoinDetailSendComponent extends Component {
     return pickerItems
   }
 
+  onChangeAmountField(btcValue){
+    const { selectedCoin } = this.state
+    let gbpValue = selectedCoin.gbpPrice * btcValue
+    gbpValue = gbpValue + ''
+    this.setState({btcValue, gbpValue})
+  }
+  onChangeAmountGBPField(gbpValue){
+    const { selectedCoin } = this.state
+    let btcValue = gbpValue / selectedCoin.gbpPrice
+    btcValue = btcValue + ''
+    console.log(btcValue)
+    this.setState({gbpValue, btcValue})
+  }
+  onUseAllFunds(){
+    const { selectedCoin } = this.state
+    let btcValue = selectedCoin.balance
+    let gbpValue = selectedCoin.balance * selectedCoin.gbpPrice
+    btcValue = btcValue + ''
+    gbpValue = gbpValue + ''
+    this.setState({gbpValue, btcValue})
+  }
+
   render() {
     const {goBack} = this.props.navigation;
-    const { selectedCoin } = this.state
+    const { selectedCoin, btcValue, gbpValue } = this.state
     const pickerItems = this.renderPickerItems()
     let cost = 0
     let balance = 0
@@ -107,9 +131,9 @@ export default class CoinDetailSendComponent extends Component {
                   <Text style={styles.BTCPayText}>Pay to</Text>
                 </Col>
                 <Col>
-                  <TouchableOpacity style={styles.BTCTextRight}>
+                  {/* <TouchableOpacity style={styles.BTCTextRight}>
                     <Text style={styles.BTCLink}>Scan QR Code</Text>
-                  </TouchableOpacity>
+                  </TouchableOpacity> */}
                 </Col>
               </Row>
               <Row>
@@ -120,16 +144,30 @@ export default class CoinDetailSendComponent extends Component {
               <Row style={styles.BTCTextRow}>
                 <Col><Text style={styles.BTCPayText}>Amount</Text></Col>
                 <Col>
-                  <TouchableOpacity style={styles.BTCTextRight}>
+                  <TouchableOpacity style={styles.BTCTextRight} onPress={() => this.onUseAllFunds()} >
                     <Text style={styles.BTCLink}>Use all funds</Text>
                   </TouchableOpacity>
                 </Col>
               </Row>
               <Row>
-                <Col><Textarea style={styles.BTCTextarea} placeholder={symbol} /></Col>          
+                <Col>
+                  <Input
+                    value={btcValue}
+                    onChangeText={(btcValue) => this.onChangeAmountField(btcValue)}
+                    keyboardType={'numeric'}
+                    style={styles.BTCTextInput} 
+                    placeholder={symbol} />
+                </Col>          
               </Row>
               <Row>
-                <Col><Textarea style={styles.BTCTextarea} placeholder="GBP" /></Col>          
+                <Col>
+                  <Input
+                    value={gbpValue}
+                    onChangeText={(gbpValue) => this.onChangeAmountGBPField(gbpValue)}
+                    keyboardType={'numeric'}
+                    style={styles.BTCTextInput} 
+                    placeholder="GBP" />
+                </Col>          
               </Row>
             </Grid>
             <Grid>
@@ -199,10 +237,9 @@ const styles = StyleSheet.create({
   BTCTextRow:{ flexDirection: 'row', justifyContent:"space-between", marginBottom:15,  },
   BTCPayText:{ color:"#333333", fontSize:16, },
   BTCLink:{ textAlign:"right", color:"#2c32b2", fontSize:16,  },
-  BTCTextarea:{ backgroundColor:"#fff",  borderRadius:8, elevation: 10, height:60, color:"#757575", fontSize:16, marginBottom:20, paddingTop:15, paddingLeft:20, paddingRight:20,  shadowColor: '#000', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.35, },
+  BTCTextarea:{ backgroundColor:"#fff",  borderRadius:8, elevation: 5, height:50, color:"#757575", fontSize:16, marginBottom:20, paddingTop:15, paddingLeft:20, paddingRight:20,  shadowColor: '#000', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.35, },
+  BTCTextInput:{ backgroundColor:"#fff",  borderRadius:8, elevation: 5, height:50, color:"#757575", fontSize:16, marginBottom:20, paddingTop:5, paddingLeft:20, paddingRight:20,  shadowColor: '#000', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.35, },
   BTCGrid:{ marginBottom:15,},
   SendButton:{ width:170, height:60, marginLeft:"auto", marginRight:"auto", marginBottom:50, borderRadius:30, backgroundColor:"#5536aa", borderColor:"#fff", borderWidth:1,   shadowColor: '#000', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.50, },
   SendButtonText:{ textAlign:"center", color:"#fff", fontSize:16, letterSpacing:0.25, width:"100%", },
-
-
-  });
+});
