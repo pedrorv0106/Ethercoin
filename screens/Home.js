@@ -54,19 +54,12 @@ export default class LandingComponent extends Component {
     let contents = []
     if(coins !== null ) {
       coins.forEach((c, index) =>{
-        let iconUrl
         let cost = c.gbpPrice * c.balance;
-        if(c.token_name === 'Bitcoin'){
-          iconUrl = require('../assets/images/crypto-icon1.png')
-        } else if(c.token_name === 'Ethereum'){
-          iconUrl = require('../assets/images/crypto-icon2.png')
-        } else {
-          iconUrl = require('../assets/images/crypto-icon3.png')
-        }
+        
         item = <Row key={c.token_name} style={styles.CryptoListRow} 
                 onPress={() => this.props.navigation.navigate('CoinDetail', {coins, selectedCoin: c})}>
           <Col style={styles.CryptoList}>
-            <Image style={styles.CryptoListImage} source={iconUrl} />
+            <Image style={styles.CryptoListImage} source={c.icon_path} />
             <Grid style={styles.ListContentBox}>
               <Col style={styles.ListContentLeft}>
                 <Text style={styles.ListContentTop}>{c.token_name}</Text>
@@ -108,7 +101,6 @@ export default class LandingComponent extends Component {
               <View style={styles.HeaderBottom}>
                   <Text style={styles.BalanceTitle}>BALANCE</Text>
                   <View style={styles.BalanceValue}>
-                    <Text style={styles.BalanceValueImage}><Image style={styles.DownIcon} source={require('../assets/images/down.png')} /></Text>
                     <Text style={styles.BalanceValueText}> £ {balance.toFixed(2)}</Text>
                   </View>
               </View>

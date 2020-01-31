@@ -51,7 +51,7 @@ export default class CoinDetailReceiveComponent extends Component {
     const {coins} = this.state
     if(coins != null){
       coins.forEach(c => {
-        const item = <Picker.Item key={c.token_symbol} label={c.token_name} value={c} />
+        const item = <Picker.Item key={c.token_symbol} label={c.token_symbol} value={c} />
         pickerItems.push(item)
       })
     }
@@ -85,7 +85,7 @@ export default class CoinDetailReceiveComponent extends Component {
                 <View style={ styles.HeaderPicker}>
                   <Picker
                     mode="dropdown"
-                    iosHeader="Select your SIM"
+                    iosHeader="Select Coin"
                     iosIcon={<Icon name="caret-down" type="FontAwesome" style={styles.DownArrow} />}
                     style={ styles.PageTitle}
                     selectedValue={this.state.selectedCoin}
@@ -102,7 +102,6 @@ export default class CoinDetailReceiveComponent extends Component {
               <View style={styles.HeaderBottom}>
                 <Text style={styles.BalanceTitle}>{balance.toFixed(4)} {symbol}</Text>
                 <View style={styles.BalanceValue}>
-                  <Text style={styles.BalanceValueImage}><Image style={styles.DownIcon} source={require('../assets/images/down2.png')} /></Text>
                   <Text style={styles.BalanceValueText}> £ {cost.toFixed(2)}</Text>
                 </View>
               </View>
@@ -119,10 +118,19 @@ export default class CoinDetailReceiveComponent extends Component {
               <Grid>
               <Row>
                 <Col>
-                  <Tabs style={styles.BTCTab} tabBarUnderlineStyle={{ backgroundColor:Platform.OS === 'ios' ? "#4a35ac" : "#9b3c9c", }}>
-                    <Tab style={styles.BTCTabCol} heading={ <TabHeading><Text style={styles.BTCTabColText}>Default</Text></TabHeading>}><Tab1 coin={selectedCoin} /></Tab>
-                    <Tab style={styles.BTCTabCol} heading={ <TabHeading><Text style={styles.BTCTabColText}>Compatibility</Text></TabHeading>}><Tab2 coin={selectedCoin}/></Tab>
-                    <Tab style={styles.BTCTabCol} heading={ <TabHeading><Text style={styles.BTCTabColText}>Legacy</Text></TabHeading>}><Tab3 coin={selectedCoin}/></Tab>
+                  <Tabs
+                    locked = {true}
+                    style={styles.BTCTab} 
+                    tabBarUnderlineStyle={{ backgroundColor:Platform.OS === 'ios' ? "#4a35ac" : "#9b3c9c", }}>
+                    <Tab style={styles.BTCTabCol} heading={ <TabHeading><Text style={styles.BTCTabColText}>Default</Text></TabHeading>}>
+                      <Tab1 coin={selectedCoin} />
+                    </Tab>
+                    <Tab style={styles.BTCTabCol} disabled={true} heading={ <TabHeading><Text style={styles.BTCTabColText}>Compatibility</Text></TabHeading>}>
+                      <Tab2 coin={selectedCoin}/>
+                    </Tab>
+                    <Tab style={styles.BTCTabCol} disabled={true} heading={ <TabHeading><Text style={styles.BTCTabColText}>Legacy</Text></TabHeading>}>
+                      <Tab3 coin={selectedCoin}/>
+                    </Tab>
                   </Tabs>
                 </Col>
               </Row>
@@ -164,7 +172,7 @@ const styles = StyleSheet.create({
   backgroundImage: { width:"100%", height:200, resizeMode: 'cover',},
   HeaderTop:{ flexDirection: 'row', justifyContent:"space-between", },
   HeaderPicker:{ display:"flex",  borderColor:"#fff", borderWidth:1, borderRadius:3,
-                  paddingLeft:0, paddingRight:0, marginTop:40, marginBottom:30, height:35, width:130,   }, 
+                  paddingLeft:0, paddingRight:0, marginTop:40, marginBottom:30, height:35, width:100,   }, 
   PageTitle:{  fontFamily:"LatoRegular", lineHeight:0, width:"100%", height:"100%",  
                   margin: 0, alignItems:"center", textAlign:"center", fontSize: 50, color:"#fff" },
   rightbutton:{ marginLeft:20, marginTop:40},

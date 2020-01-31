@@ -44,18 +44,11 @@ export default class AddCoinTokenComponent extends Component {
     let contents = []
     if(coinsSearched !== null ) {
       coinsSearched.forEach((c, index) =>{
-        let iconUrl
         let cost = c.gbpPrice * c.balance;
-        if(c.token_name === 'Bitcoin'){
-          iconUrl = require('../assets/images/crypto-icon1.png')
-        } else if(c.token_name === 'Ethereum'){
-          iconUrl = require('../assets/images/crypto-icon2.png')
-        } else {
-          iconUrl = require('../assets/images/crypto-icon3.png')
-        }
+        
         item = <Row key={c.token_name} style={styles.CryptoListRow}>
           <Col style={styles.CryptoList}>
-            <Image style={styles.CryptoListImage} source={iconUrl} />
+            <Image style={styles.CryptoListImage} source={c.icon_path} />
             <CheckBox 
               checked={c.isAdded} 
               onPress={(event) =>this.coinCheck(c, event)} 

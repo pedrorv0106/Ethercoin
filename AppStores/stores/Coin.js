@@ -10,7 +10,8 @@ const defaultObjCoin = {
   decimals: 0,
   balance: 0,
   gbpPrice: 0,
-  isAdded: true
+  isAdded: true,
+  icon_path: ''
 }
 
 export default class Coin {
@@ -24,6 +25,7 @@ export default class Coin {
   @observable balance = 0
   @observable gbpPrice = 0
   @observable isAdded = true
+  @observable icon_path = ''
 
   constructor(obj) {
     const initObj = Object.assign({}, defaultObjCoin, obj) // copy
@@ -42,7 +44,7 @@ export default class Coin {
     const {
       token_name, token_symbol, wallet_symbol, wallet_privatekey,
       wallet_address, token_contract_address, decimals, balance, gbpPrice,
-      isAdded
+      isAdded, icon_path
     } = this
     return {
       token_name,
@@ -54,7 +56,8 @@ export default class Coin {
       decimals,
       balance,
       gbpPrice,
-      isAdded
+      isAdded,
+      icon_path
     }
   }
 }

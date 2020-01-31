@@ -6,8 +6,12 @@ export default class App extends Component {
   render() {
     const {coin} = this.props
     let symbol = ''
+    let balance = 0
+    let gbp = 0;
     if(coin){
       symbol = coin.token_symbol
+      balance = coin.balance
+      gbp = coin.gbpPrice
     }
     
     return (
@@ -15,8 +19,8 @@ export default class App extends Component {
         <Image style={styles.QrImage} source={require('../assets/images/qr.jpg')} />
         <Grid style={styles.InfoBox}>
           <Row style={styles.InfoRow}>
-            <Col style={styles.InfoCol}><Text style={styles.InfoText}>0.062835 {symbol}</Text></Col>
-            <Col style={styles.InfoCol}><Text style={styles.InfoText}>500 GBP</Text></Col>
+            <Col style={styles.InfoCol}><Text style={styles.InfoText}>{balance.toFixed(4)} {symbol}</Text></Col>
+            <Col style={styles.InfoCol}><Text style={styles.InfoText}>{gbp.toFixed(4)} GBP</Text></Col>
           </Row>
         </Grid>
       </View>

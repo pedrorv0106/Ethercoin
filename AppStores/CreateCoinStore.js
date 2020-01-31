@@ -1,26 +1,20 @@
-import { action } from 'mobx';
 import Coin from './stores/Coin';
+import Coins from '../constants/coins'
 
 class CreateCoinStore {
-  handleCreateCoins(btcWallet_privateKey, btcWalletAddress, ethWallet_privateKey, ethWalletAddress){    
-    let btcCoin = new Coin({
-      token_name:'Bitcoin', token_symbol: 'BTC', wallet_symbol:'BTC', wallet_privatekey:btcWallet_privateKey, wallet_address: btcWalletAddress,
-      token_contract_address:'', decimals:0, balance:0, gbpPrice:0, isAdded: true
+  handleCreateCoins(btcWallet_privateKey, btcWalletAddress, ethWallet_privateKey, ethWalletAddress){
+    let ret = []
+    Coins.list.forEach(c => {
+      let wallet_privatekey = c.wallet_symbol === 'BTC'? btcWallet_privateKey : ethWallet_privateKey
+      let wallet_address = c.wallet_symbol === 'BTC'? btcWalletAddress : ethWalletAddress
+      let coin = new Coin({
+        token_name: c.token_name, token_symbol:c.token_symbol, wallet_symbol:c.wallet_symbol, wallet_privatekey, wallet_address,
+        token_contract_address:c.token_contract_address, decimals:c.decimals, balance:0, gbpPrice:0, isAdded: true, icon_path:c.icon_path
+      })
+      ret.push(coin)
     })
-    let ethCoin = new Coin({
-      token_name:'Ethereum', token_symbol: 'ETH', wallet_symbol:'ETH', wallet_privatekey:ethWallet_privateKey, wallet_address: ethWalletAddress,
-      token_contract_address:'', decimals:18, balance:0, gbpPrice:0, isAdded: true
-    })
-    let daiCoin = new Coin({
-      token_name:'DAI', token_symbol: 'DAI', wallet_symbol:'ETH', wallet_privatekey:ethWallet_privateKey, wallet_address: ethWalletAddress,
-      token_contract_address:'0x123456789012345678', decimals:6, balance:0, gbpPrice:0, isAdded: true
-    })
-    let usdcCoin = new Coin({
-      token_name:'USD Coin', token_symbol: 'USDC', wallet_symbol:'ETH', wallet_privatekey:ethWallet_privateKey, wallet_address: ethWalletAddress,
-      token_contract_address:'0x234567890123456789', decimals:6, balance:0, gbpPrice:0, isAdded: true
-    })
-  
-    return [btcCoin, ethCoin, daiCoin, usdcCoin]
+    
+    return ret
   }
 }
 

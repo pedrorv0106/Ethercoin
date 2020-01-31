@@ -44,21 +44,13 @@ export default class ShapeshiftExchangeComponent extends Component {
         const {exchangeCoin} = this.state
         let ret
         if(exchangeCoin){
-            let iconUrl
-            if(exchangeCoin.token_name === 'Bitcoin'){
-                iconUrl = require('../assets/images/crypto-icon1.png')
-            } else if(exchangeCoin.token_name === 'Ethereum'){
-                iconUrl = require('../assets/images/crypto-icon2.png')
-            } else {
-                iconUrl = require('../assets/images/crypto-icon3.png')
-            }
             ret = <View>
                 <Button style={styles.cryptoDropdown}
                     onPress={() => {
                         this.setState({ isDropdownExchange: true })
                     }}
                 >
-                    <Image style={styles.CryptoIcon} source={iconUrl} />
+                    <Image style={styles.CryptoIcon} source={exchangeCoin.icon_path} />
                     <Text style={styles.cryptoDropdownText}>{exchangeCoin.token_name}</Text>
                     <Icon name="caret-down" type="FontAwesome5" style={styles.cryptoDropdownArrow} />
                 </Button>
@@ -72,21 +64,13 @@ export default class ShapeshiftExchangeComponent extends Component {
         const {receiveCoin} = this.state
         let ret
         if(receiveCoin){
-            let iconUrl
-            if(receiveCoin.token_name === 'Bitcoin'){
-                iconUrl = require('../assets/images/crypto-icon1.png')
-            } else if(receiveCoin.token_name === 'Ethereum'){
-                iconUrl = require('../assets/images/crypto-icon2.png')
-            } else {
-                iconUrl = require('../assets/images/crypto-icon3.png')
-            }
             ret = <View>
                 <Button style={styles.cryptoDropdown}
                 onPress={() => {
                     this.setState({ isDropdownReceive: true })
                 }}
                 >
-                    <Image style={styles.CryptoIcon} source={iconUrl} />
+                    <Image style={styles.CryptoIcon} source={receiveCoin.icon_path} />
                     <Text style={styles.cryptoDropdownText}>{receiveCoin.token_name}</Text>
                     <Icon name="caret-down" type="FontAwesome5" style={styles.cryptoDropdownArrow} />
                 </Button>
@@ -101,14 +85,6 @@ export default class ShapeshiftExchangeComponent extends Component {
         let contents =[]
         if(coins){
             coins.forEach(c => {
-                let iconUrl
-                if(c.token_name === 'Bitcoin'){
-                    iconUrl = require('../assets/images/crypto-icon1.png')
-                } else if(c.token_name === 'Ethereum'){
-                    iconUrl = require('../assets/images/crypto-icon2.png')
-                } else {
-                    iconUrl = require('../assets/images/crypto-icon3.png')
-                }
                 item = <Button style={styles.CryptoModalButton}
                         onPress={() => {
                             this.setState({
@@ -117,7 +93,7 @@ export default class ShapeshiftExchangeComponent extends Component {
                             })
                         }}
                     >
-                        <Image style={styles.CryptoModalIcon} source={iconUrl} />
+                        <Image style={styles.CryptoModalIcon} source={c.icon_path} />
                         <Text style={styles.CryptoModalButtonText}>{c.token_name}</Text>
                     </Button>
                 contents.push(item)
@@ -130,14 +106,6 @@ export default class ShapeshiftExchangeComponent extends Component {
         let contents =[]
         if(coins){
             coins.forEach(c => {
-                let iconUrl
-                if(c.token_name === 'Bitcoin'){
-                    iconUrl = require('../assets/images/crypto-icon1.png')
-                } else if(c.token_name === 'Ethereum'){
-                    iconUrl = require('../assets/images/crypto-icon2.png')
-                } else {
-                    iconUrl = require('../assets/images/crypto-icon3.png')
-                }
                 item = <Button style={styles.CryptoModalButton}
                         onPress={() => {
                             this.setState({
@@ -146,7 +114,7 @@ export default class ShapeshiftExchangeComponent extends Component {
                             })
                         }}
                         >
-                        <Image style={styles.CryptoModalIcon} source={iconUrl} />
+                        <Image style={styles.CryptoModalIcon} source={c.icon_path} />
                         <Text style={styles.CryptoModalButtonText}>{c.token_name}</Text>
                     </Button>
                 contents.push(item)
