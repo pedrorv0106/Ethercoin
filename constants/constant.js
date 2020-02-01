@@ -14,5 +14,6 @@ export default {
   ETHEREUM: 'Ethereum',
   PENDING: 'Pending',
   SELF: 'Self',
-  
+  SIMPLEX_QUOTE_URL: 'https://sandbox.test-simplexcc.com/wallet/merchant/v2/quote',
+  SIMPLEX_API_KEY: '0355341ae024a347b804f0d4a3c620d6'
 }
