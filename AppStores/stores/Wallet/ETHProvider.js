@@ -21,6 +21,9 @@ export default class ETHProvider {
     this.wallet = new ethers.Wallet(privateKey, provider)
   }
 
+  getAddress() {
+    return this.wallet.address
+  }
   async getEtherBalance() {
     const balance = await this.wallet.provider.getBalance(this.wallet.address)
     return Number(ethers.utils.formatEther(balance))
