@@ -9,6 +9,8 @@ import DAppsComponent from '../screens/DApps';
 import RestoreWalletComponent from '../screens/RestoreWallet';
 import SettingComponent from '../screens/Settings';
 import ChangePinOneComponent from '../screens/ChangePinStep1';
+import ChangePinTwoComponent from '../screens/ChangePinStep2';
+import ChangePinThreeComponent from '../screens/ChangePinStep3';
 import CoinDetailReceiveComponent from '../screens/CoinDetailReceive';
 import CoinDetailSendComponent from '../screens/CoinDetailSend';
 import ShapeshiftExchangeComponent from '../screens/ShapeshiftExchange';
@@ -42,6 +44,8 @@ const HomeStack1 = createStackNavigator(
         RestoreWallet:RestoreWalletComponent,
         Settings:SettingComponent,
         ChangePinOne:ChangePinOneComponent,
+        ChangePinTwo:ChangePinTwoComponent,
+        ChangePinThree:ChangePinThreeComponent,
         CoinDetailReceive:CoinDetailReceiveComponent,
         CoinDetailSend:CoinDetailSendComponent,
         ShapeshiftExchange:ShapeshiftExchangeComponent,

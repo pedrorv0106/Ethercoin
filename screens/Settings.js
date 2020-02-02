@@ -1,14 +1,21 @@
 import React, { Component } from 'react';
-import { Platform, StyleSheet, Image, View, ImageBackground, TouchableOpacity } from 'react-native';
-import { Container, Header, Content, List, ListItem, Text, Icon,  } from 'native-base';
-
+import { StyleSheet, Image, View, ImageBackground, TouchableOpacity } from 'react-native';
+import { Container, Content, Text, Icon,  } from 'native-base';
+import MainStore from '../appstores/MainStore';
 
 export default class SettingComponent extends Component {
-
   static navigationOptions = {
     header: null,
   };  
 
+  gotoRecoveryPhrase(){
+    const pinCode = MainStore.appState.pinCode
+    if(pinCode){
+      this.props.navigation.navigate('ShowRecoveryPhraseStepOne')
+    } else {
+      this.props.navigation.navigate('ShowRecoveryPhraseStepTwo')
+    }
+  }
   render() {
     const {goBack} = this.props.navigation;
     return (
@@ -18,41 +25,34 @@ export default class SettingComponent extends Component {
               <Image style={styles.rightbutton} source={require('../assets/images/backbutton.png')} />
             </TouchableOpacity>
             <Text style={ styles.PageTitle}>Setting</Text>      
-            <TouchableOpacity onPress={this._onPressButton}>
-            
-            </TouchableOpacity>      
+          <TouchableOpacity onPress={this._onPressButton}/>
         </ImageBackground>
-        <Content>
-          
+
+        <Content>  
           <View style={styles.SettingList}>
-          <TouchableOpacity style={styles.SettingListButton} onPress={() => this.props.navigation.navigate('ShowRecoveryPhraseStepOne')}>
+            <TouchableOpacity style={styles.SettingListButton} onPress={() => this.gotoRecoveryPhrase()}>
               <Text style={styles.SettingListText}>Show Recovery Phrase</Text>
               <Icon name="angle-right" type="FontAwesome" style={styles.SettingListArrow}></Icon>
           </TouchableOpacity>
           </View>
-
           <View style={styles.SettingList}>
           <TouchableOpacity style={styles.SettingListButton} onPress={() => this.props.navigation.navigate('ChangePinOne')}>
               <Text style={styles.SettingListText}>Change PIN</Text>
               <Icon name="angle-right" type="FontAwesome" style={styles.SettingListArrow}></Icon>
           </TouchableOpacity>
-          </View>
-          
+          </View>     
         </Content>
       </Container>
     );
   }
 }
 
-
-
 const styles = StyleSheet.create({
-
   container:{ padding:0, margin:0,  backgroundColor:"#fff"},
   backgroundImage: { width:"100%", height:100, resizeMode: 'cover', flexDirection: 'row', justifyContent:"space-between"},
-  PageTitle:{ textAlign:"center", lineHeight:Platform.OS === 'ios' ? 90 : 120, color:"#fff", fontSize:20, fontWeight:"600", },
-rightbutton:{ marginLeft:20, marginTop:Platform.OS === 'ios' ? 40 : 45},
-leftbutton:{ marginRight:20, marginTop:Platform.OS === 'ios' ? 40 : 45},
+  PageTitle:{ textAlign:"center", paddingRight:40, lineHeight:120, color:"#fff", fontSize:20, fontWeight:"600", },
+  rightbutton:{ marginLeft:20, marginTop:45},
+  leftbutton:{ marginRight:20, marginTop:45},
   ScrollViewContainer:{ paddingTop:30, paddingLeft:20, paddingRight:20,},
   SettingList:{ padding:0, margin:0,},
   SettingListItem:{ padding:0,},

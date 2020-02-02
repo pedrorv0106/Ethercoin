@@ -28,6 +28,7 @@ class AppState {
       fast: 60
     }
     @observable allowDailyUsage = null
+    @observable pinCode = ''
   
     @observable currentCardIndex = 0
     lastestVersionRead = ''
@@ -84,6 +85,11 @@ class AppState {
   
     @action setCurrentBTCWalletIndex(index) {
       this.currentBTCWalletIndex = index
+      this.save()
+    }
+
+    @action setPinCode(code){
+      this.pinCode = code
       this.save()
     }
   
@@ -148,6 +154,7 @@ class AppState {
       this.shouldShowUpdatePopup = data.shouldShowUpdatePopup !== undefined ? data.shouldShowUpdatePopup : true
       this.lastestVersionRead = data.lastestVersionRead
       this.allowDailyUsage = data.allowDailyUsage
+      this.pinCode = data.pinCode
   
       await this.loadPendingTxs()
       await this.appWalletsStore.getWalletFromDS()
@@ -226,7 +233,8 @@ class AppState {
         enableNotification: this.enableNotification,
         lastestVersionRead: this.lastestVersionRead,
         shouldShowUpdatePopup: this.shouldShowUpdatePopup,
-        allowDailyUsage: this.allowDailyUsage
+        allowDailyUsage: this.allowDailyUsage,
+        pinCode: this.pinCode
       }
     }
   }

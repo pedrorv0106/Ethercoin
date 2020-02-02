@@ -9,7 +9,6 @@ class MainStore {
   unlock = null
   importStore = null
   backupStore = null
-  changePincode = null
   dapp = null
   importMnemonicStore = null
   importPrivateKeyStore = null
