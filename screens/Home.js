@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Platform, StyleSheet, Image, View, ImageBackground, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, Image, View, ImageBackground, TouchableOpacity, ScrollView } from 'react-native';
 import { Container, Footer, FooterTab, Button, Text, Row, Grid, Col  } from 'native-base';
 import MainStore from '../appstores/MainStore';
 
@@ -81,7 +81,7 @@ export default class LandingComponent extends Component {
 
   render() {
     const listContents = this.renderList()
-    const { balance } = this.state
+    const { balance, coins } = this.state
     return (
       <Container>
         <ScrollView style={ styles.ScrollViewContainer}>
@@ -109,7 +109,7 @@ export default class LandingComponent extends Component {
           
             {/* button */}
             <View style={styles.HomeButtonBox}>
-              <Button style={styles.HomeButton} onPress={() => this.props.navigation.navigate('BuyCrypto')}>
+              <Button style={styles.HomeButton} onPress={() => this.props.navigation.navigate('BuyCrypto', {coins})}>
                 <ImageBackground source={require('../assets/images/button-bg.png')} style={styles.HomeButtonBackground}>
                   <Text style={styles.HomeButtonText}>BUY CRYPTO</Text>
                 </ImageBackground>
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
   TabButtonImage:{ marginBottom:5,},
   HomeButtonBox:{ flexDirection: 'row', justifyContent:"space-between", paddingLeft:20, paddingRight:20, paddingTop:20,},
   HomeButton:{ width:"48%", height:60, borderRadius:40, overflow:"hidden", textAlign:"center", padding:0, },
-  HomeButtonText:{ textAlign:"center", width:"100%", height:Platform.OS === 'ios' ? 60 : 40, lineHeight: Platform.OS === 'ios' ? 50 : 60, color:"#fff", fontSize:18, },
+  HomeButtonText:{ textAlign:"center", width:"100%", height:40, lineHeight: 60, color:"#fff", fontSize:18, },
   HomeButtonBackground:{ width:"100%", height:60,  },
   CryptoListBox:{ paddingTop:20, paddingRight:20, paddingLeft:20, paddingBottom:10, },
   CryptoListRow:{ marginBottom:10,},

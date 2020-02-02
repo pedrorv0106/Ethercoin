@@ -13,6 +13,13 @@
 		6F47998B210835C800B9AEC1 /* KeyDerivation.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F479987210835C800B9AEC1 /* KeyDerivation.m */; };
 		6F47998E2108362100B9AEC1 /* Mnemonic.m in Sources */ = {isa = PBXBuildFile; fileRef = 6F47998C2108362100B9AEC1 /* Mnemonic.m */; };
 		B3E7B58A1CC2AC0600A0062D /* RNGoldenKeystore.m in Sources */ = {isa = PBXBuildFile; fileRef = B3E7B5891CC2AC0600A0062D /* RNGoldenKeystore.m */; };
+		420E26B2CA494AEAB9EA65B5 /* libRNCAsyncStorage.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 40272C2A06C94619934732F2 /* libRNCAsyncStorage.a */; };
+		28325FB6FF5C4459956849BC /* libRNGestureHandler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1F905ACA0AC54E0495F61B2C /* libRNGestureHandler.a */; };
+		35FF540EC8D648BF8DF5330A /* libRNReactNativeHapticFeedback.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C49C9FDE5E31457AAF0B1C3E /* libRNReactNativeHapticFeedback.a */; };
+		9A00035DE60944B3BAD6BD0B /* libRNMixpanel.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A91C85AB0A28441C85DC773E /* libRNMixpanel.a */; };
+		4DC7311AF1D74F1E8B6CEE99 /* libRNRandomBytes.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5310A6D0ED324581B5300939 /* libRNRandomBytes.a */; };
+		93824594874C4E92AF9F93DF /* libRNScreens.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B8FBE41AB8846DAB63916FD /* libRNScreens.a */; };
+		BDE4306CCC5F4228B055A0EE /* libRNSVG.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3B375EB68D4F4BAA949008B7 /* libRNSVG.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -42,6 +49,20 @@
 		6F47998D2108362100B9AEC1 /* Mnemonic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Mnemonic.h; sourceTree = "<group>"; };
 		B3E7B5881CC2AC0600A0062D /* RNGoldenKeystore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNGoldenKeystore.h; sourceTree = "<group>"; };
 		B3E7B5891CC2AC0600A0062D /* RNGoldenKeystore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNGoldenKeystore.m; sourceTree = "<group>"; };
+		195351FB985A4EF89A610A5E /* RNCAsyncStorage.xcodeproj */ = {isa = PBXFileReference; name = "RNCAsyncStorage.xcodeproj"; path = "../../../node_modules/@react-native-community/async-storage/ios/RNCAsyncStorage.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		40272C2A06C94619934732F2 /* libRNCAsyncStorage.a */ = {isa = PBXFileReference; name = "libRNCAsyncStorage.a"; path = "libRNCAsyncStorage.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		0870F318276943F690A6334E /* RNGestureHandler.xcodeproj */ = {isa = PBXFileReference; name = "RNGestureHandler.xcodeproj"; path = "../../../node_modules/react-native-gesture-handler/ios/RNGestureHandler.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		1F905ACA0AC54E0495F61B2C /* libRNGestureHandler.a */ = {isa = PBXFileReference; name = "libRNGestureHandler.a"; path = "libRNGestureHandler.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		98B56C6AB94548BEBD6596B1 /* RNReactNativeHapticFeedback.xcodeproj */ = {isa = PBXFileReference; name = "RNReactNativeHapticFeedback.xcodeproj"; path = "../../../node_modules/react-native-haptic-feedback/ios/RNReactNativeHapticFeedback.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		C49C9FDE5E31457AAF0B1C3E /* libRNReactNativeHapticFeedback.a */ = {isa = PBXFileReference; name = "libRNReactNativeHapticFeedback.a"; path = "libRNReactNativeHapticFeedback.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		5C61553EE2F44619AD1EC3F5 /* RNMixpanel.xcodeproj */ = {isa = PBXFileReference; name = "RNMixpanel.xcodeproj"; path = "../../../node_modules/react-native-mixpanel/RNMixpanel.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		A91C85AB0A28441C85DC773E /* libRNMixpanel.a */ = {isa = PBXFileReference; name = "libRNMixpanel.a"; path = "libRNMixpanel.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		54D4212689FC421C9D009D51 /* RNRandomBytes.xcodeproj */ = {isa = PBXFileReference; name = "RNRandomBytes.xcodeproj"; path = "../../../node_modules/react-native-randombytes/RNRandomBytes.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		5310A6D0ED324581B5300939 /* libRNRandomBytes.a */ = {isa = PBXFileReference; name = "libRNRandomBytes.a"; path = "libRNRandomBytes.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		D43A81937044478F8CE3437D /* RNScreens.xcodeproj */ = {isa = PBXFileReference; name = "RNScreens.xcodeproj"; path = "../../../node_modules/react-native-screens/ios/RNScreens.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		7B8FBE41AB8846DAB63916FD /* libRNScreens.a */ = {isa = PBXFileReference; name = "libRNScreens.a"; path = "libRNScreens.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		6AA13B6862244A55A035D5A6 /* RNSVG.xcodeproj */ = {isa = PBXFileReference; name = "RNSVG.xcodeproj"; path = "../../../node_modules/react-native-svg/ios/RNSVG.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		3B375EB68D4F4BAA949008B7 /* libRNSVG.a */ = {isa = PBXFileReference; name = "libRNSVG.a"; path = "libRNSVG.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -49,6 +70,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				420E26B2CA494AEAB9EA65B5 /* libRNCAsyncStorage.a in Frameworks */,
+				28325FB6FF5C4459956849BC /* libRNGestureHandler.a in Frameworks */,
+				35FF540EC8D648BF8DF5330A /* libRNReactNativeHapticFeedback.a in Frameworks */,
+				9A00035DE60944B3BAD6BD0B /* libRNMixpanel.a in Frameworks */,
+				4DC7311AF1D74F1E8B6CEE99 /* libRNRandomBytes.a in Frameworks */,
+				93824594874C4E92AF9F93DF /* libRNScreens.a in Frameworks */,
+				BDE4306CCC5F4228B055A0EE /* libRNSVG.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -80,8 +108,24 @@
 				B3E7B5891CC2AC0600A0062D /* RNGoldenKeystore.m */,
 				134814211AA4EA7D00B7C361 /* Products */,
 				6F4797AD2107137200B9AEC1 /* RNGoldenKeystore-Bridging-Header.h */,
+				CEA8DF4E8D92495A8107A119 /* Libraries */,
 			);
 			sourceTree = "<group>";
+		};
+		CEA8DF4E8D92495A8107A119 /* Libraries */ = {
+			isa = "PBXGroup";
+			children = (
+				195351FB985A4EF89A610A5E /* RNCAsyncStorage.xcodeproj */,
+				0870F318276943F690A6334E /* RNGestureHandler.xcodeproj */,
+				98B56C6AB94548BEBD6596B1 /* RNReactNativeHapticFeedback.xcodeproj */,
+				5C61553EE2F44619AD1EC3F5 /* RNMixpanel.xcodeproj */,
+				54D4212689FC421C9D009D51 /* RNRandomBytes.xcodeproj */,
+				D43A81937044478F8CE3437D /* RNScreens.xcodeproj */,
+				6AA13B6862244A55A035D5A6 /* RNSVG.xcodeproj */,
+			);
+			name = Libraries;
+			sourceTree = "<group>";
+			path = "";
 		};
 /* End PBXGroup section */
 
@@ -110,12 +154,12 @@
 		58B511D31A9E6C8500147676 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0830;
+				LastUpgradeCheck = 830;
 				ORGANIZATIONNAME = Facebook;
 				TargetAttributes = {
 					58B511DA1A9E6C8500147676 = {
 						CreatedOnToolsVersion = 6.1.1;
-						LastSwiftMigration = 0940;
+						LastSwiftMigration = 940;
 					};
 				};
 			};
@@ -266,7 +310,16 @@
 					"$(SRCROOT)/../../react-native/React/**",
 				);
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/RNGoldenKeystore\"",
+					"\"$(SRCROOT)/RNGoldenKeystore\"",
+					"\"$(SRCROOT)/RNGoldenKeystore\"",
+					"\"$(SRCROOT)/RNGoldenKeystore\"",
+					"\"$(SRCROOT)/RNGoldenKeystore\"",
+					"\"$(SRCROOT)/RNGoldenKeystore\"",
+					"\"$(SRCROOT)/RNGoldenKeystore\"",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -289,7 +342,16 @@
 					"$(SRCROOT)/../../react-native/React/**",
 				);
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/RNGoldenKeystore\"",
+					"\"$(SRCROOT)/RNGoldenKeystore\"",
+					"\"$(SRCROOT)/RNGoldenKeystore\"",
+					"\"$(SRCROOT)/RNGoldenKeystore\"",
+					"\"$(SRCROOT)/RNGoldenKeystore\"",
+					"\"$(SRCROOT)/RNGoldenKeystore\"",
+					"\"$(SRCROOT)/RNGoldenKeystore\"",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",

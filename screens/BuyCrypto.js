@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Platform, StyleSheet, Image, View, ImageBackground, TouchableOpacity, ScrollView } from 'react-native';
 import { Container, Footer, FooterTab, Button, Text, Row, Grid, Col, Input,  Icon, Picker  } from 'native-base';
+import fiatCurrency from '../constants/fiatCurrency'
 
 export default class BuyCryptoComponent extends Component {
   static navigationOptions = {
@@ -10,19 +11,90 @@ export default class BuyCryptoComponent extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selected: "key0"
+      coins: props.navigation.state.params.coins,
+      selectedCoin: props.navigation.state.params.coins[0],
+      selectedWallet: props.navigation.state.params.coins[0],
+      isChangingCoin: false,
+      isChangingWallet: false,
+      fiat_currency: 'USD',
+      fiat_amount: '',
+      digital_amount: ''
     };
   }
+  onBuy(){
+    console.log('onBuy')
+  }
 
-  onValueChange(value) {
+  onChangeFiatCurrencyAmount(value){
+    let fiat_amount = value + ''
+    this.setState({fiat_amount})
+  }
+  onChangeCoinAmount(value){
+    let digital_amount = value + ''
+    this.setState({digital_amount})
+  }
+  onValueChangeCoin(value) {
     this.setState({
-      selected: value
+      selectedCoin: value
     });
+  }
+  onValueChangeFiatCurrecncy(value) {
+    this.setState({
+      fiat_currency: value
+    });
+  }
+
+  renderCoinPickerItems(){
+    const pickerItems = []
+    const {coins} = this.state
+    if(coins != null){
+      coins.forEach(c => {
+        const item = <Picker.Item key={c.token_symbol} label={c.token_symbol} value={c} />
+        pickerItems.push(item)
+      })
+    }
+    return pickerItems
+  }
+  renderFiatCurrencyPickerItems(){
+    const pickerItems = []
+    fiatCurrency.list.forEach(c => {
+      const item = <Picker.Item key={c.value} label={c.value} value={c.value} />
+      pickerItems.push(item)
+    })
+  
+    return pickerItems
+  }
+
+  renderDropdownSelectWallet(){
+    let {coins} = this.state
+    let contents =[]
+    if(coins){
+        coins.forEach(c => {
+            item = <Button style={styles.CryptoModalButton}
+                onPress={() => {
+                  this.setState({
+                    isChangingWallet: false,
+                    selectedWallet: c
+                  })
+                }}
+                >
+              <Image style={styles.CryptoModalIcon} source={c.icon_path} />
+              <Text style={styles.CryptoModalButtonText}>{c.token_name}</Text>
+            </Button>
+            contents.push(item)
+        })
+    }
+    return contents
   }
 
   render() {
     const {goBack} = this.props.navigation;
-    
+    const { fiat_amount, selectedWallet, digital_amount} = this.state
+    const dropdownWallet = this.renderDropdownSelectWallet()
+    const fiatPickerItems = this.renderFiatCurrencyPickerItems()
+    const coinPikcerItems = this.renderCoinPickerItems()
+    const costSelectedWallet = selectedWallet.balance * selectedWallet.gbpPrice
+
     return (
       <Container>
         <View style={ styles.container }>
@@ -45,11 +117,14 @@ export default class BuyCryptoComponent extends Component {
             <Grid style={ styles.WalletGrid}>
               <ImageBackground source={require('../assets/images/WalletBackground.png')} style={styles.WalletBackground}>
                 <Col style={ styles.WalletCol}>
-                  <Image style={styles.WalletIcon} source={require('../assets/images/crypto-icon6.png')} />
+                  <Image style={styles.WalletIcon} source={selectedWallet.icon_path} />
                   <Text style={styles.WalletTitle}>My Wallet</Text>
-                  <Text style={styles.WalletDetail}>...aX0jYnvFr5tEgG7kLqO</Text>
-                  <Text style={styles.WalletAmount}>£ 1428.00</Text>
-                    <TouchableOpacity style={styles.WalletButton} onPress={this._onPressButton}>
+                  <Text style={styles.WalletDetail}>{selectedWallet.wallet_address}</Text>
+                  <Text style={styles.WalletAmount}>£ {costSelectedWallet.toFixed(2)}</Text>
+                    <TouchableOpacity style={styles.WalletButton} 
+                      onPress={() => {
+                        this.setState({ isChangingWallet: true })
+                      }}>
                       <Text style={styles.WalletButtonText}>CHANGE</Text>
                     </TouchableOpacity>
                 </Col>
@@ -57,7 +132,12 @@ export default class BuyCryptoComponent extends Component {
             </Grid>
             <Grid style={ styles.CryptoGrid}>
               <Col style={ styles.CryptoCol}>
-                <Input placeholder="" value="0.00" style={ styles.CryptoInput} />
+                <Input
+                  onChangeText={(value) => this.onChangeFiatCurrencyAmount(value)}
+                  keyboardType={'numeric'}
+                  placeholder="0.00"
+                  value={fiat_amount}
+                  style={ styles.CryptoInput} />
                 <View style={ styles.CryptoSelect}>
                   <ImageBackground source={require('../assets/images/WalletBackground.png')} style={styles.SelectBackground}>
                     <Picker
@@ -65,21 +145,24 @@ export default class BuyCryptoComponent extends Component {
                       iosHeader="Select your SIM"
                       iosIcon={<Icon name="caret-down" type="FontAwesome" style={styles.DownArrow} />}
                       style={ styles.colPicker}
-                      selectedValue={this.state.selected}
-                      onValueChange={this.onValueChange.bind(this)}
+                      selectedValue={this.state.fiat_currency}
+                      onValueChange={this.onValueChangeFiatCurrecncy.bind(this)}
                       textStyle={{ fontSize:18,color:"#fff",}}
                     >
-                      <Picker.Item label="GBP" value="key0" />
-                      <Picker.Item label="BTC" value="key1" />
+                      {fiatPickerItems}
                     </Picker> 
                   </ImageBackground>
                 </View>
-                
               </Col>
             </Grid>
             <Grid style={ styles.CryptoGrid}>
               <Col style={ styles.CryptoCol}>
-                <Input placeholder="" value="0.00" style={ styles.CryptoInput} />
+                <Input 
+                  onChangeText={(value) => this.onChangeCoinAmount(value)}
+                  keyboardType={'numeric'}
+                  placeholder="0.00" 
+                  value={digital_amount}
+                  style={ styles.CryptoInput} />
                 <View style={ styles.CryptoSelect}>
                   <ImageBackground source={require('../assets/images/WalletBackground.png')} style={styles.SelectBackground}>
                     <Picker
@@ -87,19 +170,19 @@ export default class BuyCryptoComponent extends Component {
                       iosHeader="Select your SIM"
                       iosIcon={<Icon name="caret-down" type="FontAwesome" style={styles.DownArrow} />}
                       style={ styles.colPicker}
-                      selectedValue={this.state.selected}
-                      onValueChange={this.onValueChange.bind(this)}
+                      selectedValue={this.state.selectedCoin}
+                      onValueChange={this.onValueChangeCoin.bind(this)}
                       textStyle={{ fontSize:Platform.OS === 'ios' ? 18 : 30,color:"#fff",}}
                     >                
-                      <Picker.Item label="GBP" value="key0" />
-                      <Picker.Item label="BTC" value="key1" />
+                      {coinPikcerItems}
                     </Picker> 
                   </ImageBackground>
                 </View>
               </Col>
             </Grid>
 
-            <TouchableOpacity style={ styles.BackupButtonBox}>
+            <TouchableOpacity style={ styles.BackupButtonBox}
+              onPress={()=>this.onBuy()}>
               <ImageBackground source={require('../assets/images/button-bg.png')} style={styles.BackupButtonbg}>
                 <Text style={ styles.BackupButton}>BUY</Text>  
               </ImageBackground>
@@ -138,6 +221,11 @@ export default class BuyCryptoComponent extends Component {
           </FooterTab>
         </Footer>
         {/* Footer End */}
+
+        { this.state.isChangingWallet && <View style={styles.CryptoModal}>
+          { dropdownWallet }
+        </View>
+        }
       </Container>
     );
   }
@@ -183,4 +271,9 @@ const styles = StyleSheet.create({
   PoweredCol:{ textAlign:"center", },
   PoweredImage:{ marginLeft:"auto", marginRight:"auto", },
   PoweredText:{ textAlign:"center", color:"#666666", fontSize:16, marginTop:5, },
+
+  CryptoModal: { position: "absolute", left: 0, top: 0, width: "100%", height: "100%", backgroundColor: "#fff", zIndex: 999, paddingTop: 40, paddingLeft: 20, paddingRight: 20, },
+  CryptoModalButton: { backgroundColor: "transparent", alignItems: "flex-start", textAlign: "left", justifyContent: "flex-start", borderBottomColor: "#ededed", borderBottomWidth: 1, paddingTop: 15, paddingBottom: 15, height: 70, },
+  CryptoModalButtonText: { lineHeight: 30, textAlign: "left", color: "#333333", fontSize: 18 },
+  CryptoModalIcon: { width: 40, height: 40, marginRight: 20, },
 });
