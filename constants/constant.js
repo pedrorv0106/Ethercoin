@@ -1,4 +1,6 @@
 export default {
+  BITCOIN_NETWORK : 'testnet',
+  ETHEREUM_NETWORK : 'ropsten',
   INFURA_API_KEY: 'qMZ7EIind33NY9Azu836',
   BACKUP: 'Backup',
   RECEIVE: 'Receive',
