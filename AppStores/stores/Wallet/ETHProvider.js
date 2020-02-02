@@ -21,7 +21,7 @@ export default class ETHProvider {
     this.wallet = new ethers.Wallet(privateKey, provider)
   }
 
-  getAddress() {
+  address() {
     return this.wallet.address
   }
   async getEtherBalance() {
