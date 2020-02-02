@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, ImageBackground, TouchableOpacity, ScrollView, Image } from 'react-native';
-import { Container, Footer, FooterTab, Grid, Col, Picker, Icon, Row, Textarea, Button } from 'native-base';
+import { Container, Footer, FooterTab, Grid, Col, Icon, Row, Input, Button } from 'native-base';
 import MainStore from '../appstores/MainStore';
+import * as changelly from '../api/changelly'
 
 export default class ShapeshiftExchangeComponent extends Component {
     static navigationOptions = {
@@ -14,7 +15,9 @@ export default class ShapeshiftExchangeComponent extends Component {
             isDropdownExchange: false,
             exchangeCoin: null,
             isDropdownReceive: false,
-            receiveCoin: null 
+            receiveCoin: null,
+            valueExchange: '',
+            valueReceive: ''
         }
     }
 
@@ -37,7 +40,41 @@ export default class ShapeshiftExchangeComponent extends Component {
     }
 
     onNext(){
+        console.log('onNext')
+    }
 
+    getExchnageAmount(){
+        let params = {
+            'from': this.state.exchangeCoin.token_symbol,
+            'to': this.state.receiveCoin.token_symbol,
+            'amount': 2
+          }
+          changelly.API('getExchangeAmount', params).then((res) => {
+            console.log("Success", res)
+            // let sample_response = {
+            //   jsonrpc: "2.0",
+            //   id: "test",
+            //   result: "0.72596439091239070521"
+            // }      
+            // this.setState({second_input_amount: sample_response.result})
+          }, error => {
+            console.log("Failed", error)
+          })
+    }
+
+    onUseAllFunds(){
+        const {exchangeCoin } = this.state
+        let valueExchange = exchangeCoin.balance
+        // let valueReceive = 
+        valueExchange = valueExchange + ''
+        // valueReceive = valueReceive + ''
+        this.setState({ valueExchange })
+    }
+    onChangeAmountExchange(valueExchange){
+        this.setState({valueExchange})
+    }
+    onChangeAmountReceive(valueReceive){
+        this.setState({valueReceive})
     }
     
     renderExchangeField(){
@@ -125,7 +162,7 @@ export default class ShapeshiftExchangeComponent extends Component {
 
     render() {
         const { goBack } = this.props.navigation;
-        const {exchangeCoin, receiveCoin} = this.state
+        const {exchangeCoin, receiveCoin, valueExchange, valueReceive} = this.state
         let exchangeHintText = ''
         let receiveHintText = ''
         if(exchangeCoin){
@@ -173,13 +210,31 @@ export default class ShapeshiftExchangeComponent extends Component {
                         <Grid style={styles.BTCGrid}>
                             <Row style={styles.BTCTextRow}>
                                 <Col><Text style={styles.BTCPayText}>Amount</Text></Col>
-                                <Col><TouchableOpacity style={styles.BTCTextRight}><Text style={styles.BTCLink}>Use all funds</Text></TouchableOpacity></Col>
+                                <Col>
+                                    <TouchableOpacity style={styles.BTCTextRight} onPress={() => this.onUseAllFunds()}>
+                                        <Text style={styles.BTCLink}>Use all funds</Text>
+                                    </TouchableOpacity>
+                                </Col>
                             </Row>
                             <Row>
-                                <Col><Textarea style={styles.BTCTextarea} placeholder={exchangeHintText} /></Col>
+                                <Col>
+                                    <Input
+                                        value={valueExchange}
+                                        onChangeText={(value) => this.onChangeAmountExchange(value)}
+                                        keyboardType={'numeric'}
+                                        style={styles.BTCTextarea} 
+                                        placeholder={exchangeHintText} />
+                                </Col>
                             </Row>
                             <Row>
-                                <Col><Textarea style={styles.BTCTextarea} placeholder={receiveHintText} /></Col>
+                                <Col>
+                                    <Input
+                                        value={valueReceive}
+                                        onChangeText={(value) => this.onChangeAmountGBPField(value)}
+                                        keyboardType={'numeric'}
+                                        style={styles.BTCTextarea} 
+                                        placeholder={receiveHintText} />
+                                </Col>
                             </Row>
                         </Grid>
 
@@ -247,7 +302,9 @@ const styles = StyleSheet.create({
     BTCTextRow: { flexDirection: 'row', justifyContent: "space-between", marginBottom: 15, },
     BTCPayText: { color: "#333333", fontSize: 16, },
     BTCLink: { textAlign: "right", color: "#2c32b2", fontSize: 16, },
-    BTCTextarea: { backgroundColor: "#fff", borderRadius: 8, height: 60, color: "#757575", fontSize: 16, marginBottom: 20, paddingTop: 15, paddingLeft: 20, elevation: 10, paddingRight: 20, shadowColor: '#000', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.35, },
+    BTCTextarea: { backgroundColor: "#fff", borderRadius: 8, height: 50, color: "#757575", fontSize: 16, 
+                marginBottom: 20, paddingTop: 5, paddingLeft: 20, elevation: 5, paddingRight: 20, 
+                shadowColor: '#000', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.35, },
     ChangellyText1: { color: "#333333", fontSize: 16, lineHeight: 26, marginBottom: 20, },
     ChangellyText2: { color: "#333333", fontSize: 16, lineHeight: 26, marginBottom: 20, fontWeight: "600", },
     ColTitle: { color: "#757575", fontSize: 16, letterSpacing: 0.25, width: "100%", marginBottom: 5, },
