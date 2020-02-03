@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import { Platform, StyleSheet, View, ImageBackground, TouchableOpacity, Image, ScrollView, Alert } from 'react-native';
 import { Input, Text } from 'native-base';
 import MainStore from '../appstores/MainStore';
-import BackupStore from '../appstores/BackupStore';
+import CreateWalletStore from '../appstores/CreateWalletStore';
 
 export default class RestoreWalletComponent extends Component {
   static navigationOptions = {
@@ -23,7 +23,7 @@ export default class RestoreWalletComponent extends Component {
     passphraseInputValue11: '',
     passphraseInputValue12: '',
   }
-  onRestore = () =>{
+  onRestore = async () =>{
     const {
       passphraseInputValue1, passphraseInputValue2, passphraseInputValue3, passphraseInputValue4,
       passphraseInputValue5, passphraseInputValue6, passphraseInputValue7, passphraseInputValue8,
@@ -44,9 +44,7 @@ export default class RestoreWalletComponent extends Component {
     || passphraseInputValue12.trim() == ""
     ) {
       Alert.alert(
-        //title
         'Error',
-        //body
         'Please input correct Passphrase words.',
         [
           {text: 'OK', onPress: () => console.log('OK Pressed')},
@@ -55,12 +53,13 @@ export default class RestoreWalletComponent extends Component {
       );
     } else {
       const mnemonic = `${passphraseInputValue1} ${passphraseInputValue2} ${passphraseInputValue3} ${passphraseInputValue4} ${passphraseInputValue5} ${passphraseInputValue6} ${passphraseInputValue7} ${passphraseInputValue8} ${passphraseInputValue9} ${passphraseInputValue10} ${passphraseInputValue11} ${passphraseInputValue12}`;
-      MainStore.backupStore = new BackupStore();
-      MainStore.backupStore.setMnemonic(mnemonic);
-      MainStore.backupStore.setup();
+      const createWalletStore = new CreateWalletStore();
+      await createWalletStore.handleRestoreWallet(mnemonic);
+
       this.props.navigation.navigate('Main')
     }
   }
+
   render() {
     const {goBack} = this.props.navigation;
     return (
@@ -226,18 +225,18 @@ export default class RestoreWalletComponent extends Component {
 const styles = StyleSheet.create({
   container:{ flex: 1, backgroundColor:"#fff"},
   backgroundImage: { width:"100%", height:100, resizeMode: 'cover', flexDirection: 'row', justifyContent:"space-between"},
-  PageTitle:{ textAlign:"center", lineHeight:Platform.OS === 'ios' ? 90 : 120, color:"#fff", fontSize:20, fontWeight:"600", },
-  rightbutton:{ marginLeft:20, marginTop:Platform.OS === 'ios' ? 40 : 45},
-  leftbutton:{ marginRight:20, marginTop:Platform.OS === 'ios' ? 40 : 45},
+  PageTitle:{ paddingRight:40, textAlign:"center", lineHeight:120, color:"#fff", fontSize:20, fontWeight:"600", },
+  rightbutton:{ marginLeft:20, marginTop: 45},
+  leftbutton:{ marginRight:20, marginTop: 45},
   ScrollViewContainer:{ paddingTop:30, paddingLeft:20, paddingRight:20,},
   PassphraseBox:{ backgroundColor:"#f9f2fd", borderStyle:"dotted", borderWidth:1, borderColor:"#5a4c75", textAlign:"center", padding:20, borderRadius:5, marginBottom:20,},
   PassphraseText1:{ textAlign:"center", color:"#5f36a8", fontWeight:"600", fontSize:18, fontFamily:'LatoRegular', fontWeight:"600" },
   PassphraseText2:{ textAlign:"center", color:"#5f36a8", fontSize:16, },
   PassphraseListTitle:{ textAlign:"center", color:"#333333", fontSize:18, letterSpacing:0.25, marginBottom:10},
   PassphraseCol:{ position:"relative", paddingLeft:55, minHeight:60, marginBottom:20, borderRadius:30, paddingRight:10, elevation: 10,  shadowColor: '#000', shadowOffset: { width: 0, height: 2 },shadowOpacity: 0.35, backgroundColor:"#fff"},
-  PassphraseListNumber:{ position:"absolute", left:10, top:10, width:40, height:40, borderRadius:20, borderColor:"#6137a7", borderWidth:2, textAlign:"center", lineHeight:Platform.OS === 'ios' ? 28 : 40, borderStyle:"solid", color:"#6137a7", fontSize:20, },
+  PassphraseListNumber:{ position:"absolute", left:10, top:10, width:40, height:40, borderRadius:20, borderColor:"#6137a7", borderWidth:2, textAlign:"center", lineHeight: 36, borderStyle:"solid", color:"#6137a7", fontSize:20, },
   PassphraseListText:{ lineHeight:40, color:"#333333", fontSize:18},
   BackupButtonBox:{ marginBottom:50, marginTop:20, width:170, height:52, marginRight:"auto", marginLeft:"auto"},
-  BackupButton:{ textAlign:"center", lineHeight:Platform.OS === 'ios' ? 40 : 50, color:"#f5f5f5", fontSize:Platform.OS === 'ios' ? 16 : 18},
+  BackupButton:{ textAlign:"center", lineHeight:50, color:"#f5f5f5", fontSize:18},
   BackupButtonbg:{ width:"100%", height:"100%"},
 });

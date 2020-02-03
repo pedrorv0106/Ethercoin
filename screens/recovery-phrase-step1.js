@@ -1,14 +1,12 @@
 import React, { Component } from 'react';
 import { Platform, StyleSheet, View, ImageBackground, Image, TouchableOpacity, ScrollView} from 'react-native';
 import { Text, CheckBox, } from 'native-base';
-import { observer } from 'mobx-react/native';
 import MainStore from '../appstores/MainStore';
 import BackupStore from '../appstores/BackupStore';
 import SecureDS from '../appstores/datasource/SecureDS';
 
 export default class RecoveryStepOneComponent extends Component {
     static navigationOptions = {
-        //To hide the ActionBar/NavigationBar
         header: null,
     };
     state = {
@@ -16,7 +14,7 @@ export default class RecoveryStepOneComponent extends Component {
     }
     async componentWillMount() {
         MainStore.backupStore = new BackupStore();
-        const mnemonic = await new SecureDS('111111').deriveMnemonic();
+        const mnemonic = await new SecureDS('1111').deriveMnemonic();
         MainStore.backupStore.setMnemonic(mnemonic);
         MainStore.backupStore.setup();
         let mnemonicArray = MainStore.backupStore.listMnemonic.slice();
@@ -121,9 +119,9 @@ export default class RecoveryStepOneComponent extends Component {
 const styles = StyleSheet.create({
     container:{ flex: 1, backgroundColor:"#fff"},
     backgroundImage: { width:"100%", height:100, resizeMode: 'cover', flexDirection: 'row', justifyContent:"space-between"},
-    PageTitle:{ textAlign:"center", lineHeight:Platform.OS === 'ios' ? 90 : 120, color:"#fff", fontSize:20, fontWeight:"600", },
-    rightbutton:{ marginLeft:20, marginTop:Platform.OS === 'ios' ? 40 : 45},
-    leftbutton:{ marginRight:20, marginTop:Platform.OS === 'ios' ? 40 : 45},
+    PageTitle:{ textAlign:"center", lineHeight:120, color:"#fff", fontSize:20, fontWeight:"600", },
+    rightbutton:{ marginLeft:20, marginTop:45},
+    leftbutton:{ marginRight:20, marginTop:45},
     ScrollViewContainer:{ paddingTop:30, paddingLeft:20, paddingRight:20,},
     RecoveryText:{ textAlign:"center", color:"#000", fontSize:16, lineHeight:22, marginBottom:30 },
     RecoveryText2:{ textAlign:"center", color:"#e71629", fontWeight:"600", fontSize:16, lineHeight:22, marginBottom:30 },
@@ -131,8 +129,8 @@ const styles = StyleSheet.create({
     PhraseContainer:{ borderColor:"#6137a7", borderStyle:"dotted", borderWidth:1, borderRadius:10, paddingLeft:20, paddingRight:20, paddingTop:30, flexDirection: 'row', },
     PhraseCol:{ width:"50%", },
     PhraseColList:{ position:"relative", paddingLeft:65, minHeight:50, marginBottom:30},
-    PhraseColNumber:{  fontFamily:"LatoRegular", position:"absolute", left:0, top:0, width:50, height:50, borderRadius:25, borderColor:"#6137a7", borderWidth:2, textAlign:"center", lineHeight:Platform.OS === 'ios' ? 38 : 46, borderStyle:"solid", color:"#6137a7", fontSize:22, },
-    PhraseColText:{ lineHeight:Platform.OS === 'ios' ? 40 : 45, color:"#333333", fontSize:18, fontFamily:"LatoRegular", fontWeight:"500", },
+    PhraseColNumber:{  fontFamily:"LatoRegular", position:"absolute", left:0, top:0, width:50, height:50, borderRadius:25, borderColor:"#6137a7", borderWidth:2, textAlign:"center", lineHeight:46, borderStyle:"solid", color:"#6137a7", fontSize:22, },
+    PhraseColText:{ lineHeight:45, color:"#333333", fontSize:18, fontFamily:"LatoRegular", fontWeight:"500", },
     SafelyCol:{ flexDirection: 'row', marginBottom:50, paddingLeft:10, paddingTop:15,},
     SafelyCheckbox:{ borderColor:"#2c32b2", color:"#2c32b2", marginRight:10,},
     SafelyText:{ color:"#2c32b2", fontSize:14, marginLeft:5,}

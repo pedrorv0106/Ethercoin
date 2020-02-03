@@ -62,7 +62,7 @@ export default class AppCoinsStore {
     
     setTimeout(() =>{
       this.getBalances()
-    }, 10000)
+    }, Constant.INTERVAL_GET_GBP)
   }
   getIndexCoin(symbol){
     let ret = -1

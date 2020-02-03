@@ -7,15 +7,19 @@ import ETHProvider from '../providers/ETHProvider'
 
 class CreateWalletStore {
     async handleCreateWallet() {
-        this.loading = true
         const secureDS = new SecureDS('1111')
+        const mnemonic = await secureDS.deriveMnemonic()
+
+        this.handleRestoreWallet(mnemonic)
+    }
+
+    async handleRestoreWallet(mnemonic) {
         let pathETH = Keystore.CoinType.ETH.path
         let pathBTC = Keystore.CoinType.BTC.path
 
         pathETH = pathETH.replace('/index', '')
         pathBTC = pathBTC.replace('/index', '')
 
-        const mnemonic = await secureDS.deriveMnemonic()
         const provider = ethers.getDefaultProvider('mainnet')//production ? 'mainnet' : 'ropsten'
         const walletETH = ethers.Wallet.fromMnemonic(mnemonic, pathETH).connect(provider)
         const ethPrivateKey = walletETH.privateKey //test "4E02B37F3CA2F1951C89FF0EC8B0E5585B817333FBC40B8C64D7FED79EB653CE"
@@ -33,6 +37,7 @@ class CreateWalletStore {
         MainStore.appState.btcAddress = btcAddress
         MainStore.appState.ethPrivateKey = ethPrivateKey
         MainStore.appState.ethAddress = ethAddress
+        MainStore.appState.mnemonic = mnemonic
         MainStore.appState.save()
         MainStore.appState.appCoinsStore.getBalances()
     }
