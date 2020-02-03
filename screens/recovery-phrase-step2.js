@@ -19,15 +19,15 @@ export default class RecoveryStepTwoComponent extends Component {
       mnemonicString: mnemonicString,
       mnemonic: mnemonic,
       listKeywordRandom: listKeywordRandom,
-    passphraseInputValue1: '',
-    passphraseInputValue2: '',
-    passphraseInputValue3: '',
-    passphraseInputValue4: '',
+      passphraseInputValue1: '',
+      passphraseInputValue2: '',
+      passphraseInputValue3: '',
+      passphraseInputValue4: '',
     };
   }
   onBackupNow = async () =>{
     const {listKeywordRandom, passphraseInputValue1, passphraseInputValue2, passphraseInputValue3, passphraseInputValue4} = this.state;
-  
+    
     if(passphraseInputValue1 === listKeywordRandom[0]
       && passphraseInputValue2 === listKeywordRandom[1]
       && passphraseInputValue3 === listKeywordRandom[2]

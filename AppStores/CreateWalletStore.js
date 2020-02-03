@@ -18,12 +18,13 @@ class CreateWalletStore {
         const walletBTC = ethers.Wallet.fromMnemonic(mnemonic, pathBTC).connect(provider)
         const btcPrivateKey = walletBTC.privateKey
       
-        const ethProvider = new ETHProvider(ethPrivateKey)
+        const ethProvider = new ETHProvider(mnemonic)
         const ethAddress = ethProvider.address()
         const btcAddress = 'bc1qxjfpe9svhgypa2h4l8pk57rahxw9fcawd3fk7h'
         
         const createCoinStore = new CreateCoinStore();
         const coinArray = createCoinStore.handleCreateCoins(btcPrivateKey, btcAddress, ethPrivateKey, ethAddress);
+        MainStore.appState.appCoinsStore.ethProvider = ethProvider
         MainStore.appState.appCoinsStore.addCoins(coinArray)
         MainStore.appState.btcPrivateKey = btcPrivateKey
         MainStore.appState.btcAddress = btcAddress

@@ -42,8 +42,8 @@ export default class AppCoinsStore {
       console.log('Ethereum Address: ', MainStore.appState.ethAddress)
       let ethPrivateKey = MainStore.appState.ethPrivateKey
       ethPrivateKey = ethPrivateKey.replace('0x', '')
-      console.log('Ethereum Private Key: ', ethPrivateKey)
-      this.ethProvider = new ETHProvider(ethPrivateKey)
+      console.log('Mnemonic: ', MainStore.appState.mnemonic, ethPrivateKey)
+      this.ethProvider = new ETHProvider(MainStore.appState.mnemonic)
     }
     try {
       const response = await fetch(Constant.COINMARKET_GET_GBP_URL)
