@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
-import { Platform, StyleSheet, View, ImageBackground, Image, TouchableOpacity, ScrollView} from 'react-native';
+import { StyleSheet, View, ImageBackground, Image, TouchableOpacity, ScrollView} from 'react-native';
 import { Text, CheckBox, } from 'native-base';
-import MainStore from '../appstores/MainStore';
-import BackupStore from '../appstores/BackupStore';
 import SecureDS from '../appstores/datasource/SecureDS';
 
 export default class RecoveryStepOneComponent extends Component {
@@ -10,20 +8,18 @@ export default class RecoveryStepOneComponent extends Component {
         header: null,
     };
     state = {
-        mnemonic: null
+        mnemonic: null,
+        mnemonicString: '',
     }
     async componentWillMount() {
-        MainStore.backupStore = new BackupStore();
-        const mnemonic = await new SecureDS('1111').deriveMnemonic();
-        MainStore.backupStore.setMnemonic(mnemonic);
-        MainStore.backupStore.setup();
-        let mnemonicArray = MainStore.backupStore.listMnemonic.slice();
-        this.setState({ mnemonic: mnemonicArray })
+        const mnemonicString = await new SecureDS('1111').deriveMnemonic();
+        let mnemonic = mnemonicString.split(' ')
+        this.setState({ mnemonic, mnemonicString  })
     }
 
     render() {
         const {goBack} = this.props.navigation;
-        const { mnemonic } = this.state
+        const { mnemonic, mnemonicString } = this.state
         let PhraseContainer;
         if(!mnemonic){
             PhraseContainer = <View style={ styles.PhraseContainer}/>   
@@ -92,7 +88,7 @@ export default class RecoveryStepOneComponent extends Component {
                         <Image style={styles.rightbutton} source={require('../assets/images/backbutton.png')} />
                     </TouchableOpacity>
                     <Text style={ styles.PageTitle}>Recovery Phrase</Text>      
-                    <TouchableOpacity onPress={() => this.props.navigation.navigate('RecoveryStepTwo')}>
+                    <TouchableOpacity onPress={() => this.props.navigation.navigate('RecoveryStepTwo', { mnemonicString })}>
                         <Image style={styles.leftbutton} source={require('../assets/images/forewordbutton.png')} />
                     </TouchableOpacity>      
                 </ImageBackground>

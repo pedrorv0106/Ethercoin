@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import { StyleSheet, Text, View, ImageBackground, TouchableOpacity, Image, ScrollView, CheckBox } from 'react-native';
 import MainStore from '../appstores/MainStore';
-import SecureDS from '../appstores/datasource/SecureDS';
 
 export default class ShowRecoveryPhraseStepTwoComponent extends Component {
   static navigationOptions = {
@@ -11,10 +10,8 @@ export default class ShowRecoveryPhraseStepTwoComponent extends Component {
     mnemonic: null,
   }
   async componentWillMount() {
-    const secureDS = new SecureDS('1111')
-    const mnemonicString = await secureDS.deriveMnemonic()
+    const mnemonicString = MainStore.appState.mnemonic
     const mnemonic = mnemonicString.split(' ').map(String)
-    console.log('aaaaa', mnemonic)
     this.setState({mnemonic})
   }
   render() {

@@ -1,38 +1,44 @@
 import React, {Component} from 'react';
-import { Platform, StyleSheet, View, ImageBackground, Alert, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { StyleSheet, View, ImageBackground, Alert, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { Input, Text } from 'native-base';
-import MainStore from '../appstores/MainStore';
 import CreateWalletStore from '../appstores/CreateWalletStore';
+import shuffle from 'lodash.shuffle'
 
 export default class RecoveryStepTwoComponent extends Component {
   static navigationOptions = {
-    //To hide the ActionBar/NavigationBar
     header: null,
   };
-  state = {
+  constructor(props) {
+    super(props);
+    
+    const mnemonicString = props.navigation.state.params.mnemonicString
+    let mnemonic = mnemonicString.split(' ')
+    let listKeywordRandom = shuffle(mnemonic)
+
+    this.state = {
+      mnemonicString: mnemonicString,
+      mnemonic: mnemonic,
+      listKeywordRandom: listKeywordRandom,
     passphraseInputValue1: '',
     passphraseInputValue2: '',
     passphraseInputValue3: '',
     passphraseInputValue4: '',
+    };
   }
-  
   onBackupNow = async () =>{
-    const {passphraseInputValue1, passphraseInputValue2, passphraseInputValue3, passphraseInputValue4} = this.state;
-    const listKeywordRandom = MainStore.backupStore.obj.listKeywordRandom;
-
+    const {listKeywordRandom, passphraseInputValue1, passphraseInputValue2, passphraseInputValue3, passphraseInputValue4} = this.state;
+  
     if(passphraseInputValue1 === listKeywordRandom[0]
       && passphraseInputValue2 === listKeywordRandom[1]
       && passphraseInputValue3 === listKeywordRandom[2]
       && passphraseInputValue4 === listKeywordRandom[3]) {        
         const createWalletStore = new CreateWalletStore();
-        await createWalletStore.handleCreateWallet();
+        await createWalletStore.handleRestoreWallet(this.state.mnemonicString);
 
         this.props.navigation.navigate('Main')
     } else {
       Alert.alert(
-        //title
         'Error',
-        //body
         'Please input correct Passphrase words.',
         [
           {text: 'OK', onPress: () => console.log('OK Pressed')},
@@ -44,8 +50,7 @@ export default class RecoveryStepTwoComponent extends Component {
 
   render() {
     const {goBack} = this.props.navigation;
-    const mnemonic = MainStore.backupStore.listMnemonic.slice();
-    const listKeywordRandom = MainStore.backupStore.obj.listKeywordRandom;
+    const {mnemonic, listKeywordRandom} = this.state
     const passphraseIndex1 = mnemonic.indexOf(listKeywordRandom[0]);
     const passphraseIndex2 = mnemonic.indexOf(listKeywordRandom[1]);
     const passphraseIndex3 = mnemonic.indexOf(listKeywordRandom[2]);

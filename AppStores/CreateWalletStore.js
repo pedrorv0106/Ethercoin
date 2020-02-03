@@ -1,18 +1,10 @@
 import MainStore from './MainStore';
-import SecureDS from './datasource/SecureDS';
 import Keystore from '../libs/react-native-golden-keystore';
 import CreateCoinStore from './CreateCoinStore';
 import { ethers } from 'ethers';
 import ETHProvider from '../providers/ETHProvider'
 
 class CreateWalletStore {
-    async handleCreateWallet() {
-        const secureDS = new SecureDS('1111')
-        const mnemonic = await secureDS.deriveMnemonic()
-
-        this.handleRestoreWallet(mnemonic)
-    }
-
     async handleRestoreWallet(mnemonic) {
         let pathETH = Keystore.CoinType.ETH.path
         let pathBTC = Keystore.CoinType.BTC.path

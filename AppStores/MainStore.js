@@ -8,7 +8,6 @@ class MainStore {
   sendTransaction = null
   unlock = null
   importStore = null
-  backupStore = null
   dapp = null
   importMnemonicStore = null
   importPrivateKeyStore = null
