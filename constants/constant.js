@@ -1,6 +1,11 @@
 export default {
-  BITCOIN_NETWORK : 'testnet',
-  ETHEREUM_NETWORK : 'ropsten',
+  BTC_NETWORK : 'testnet',  // livenet or testnet
+  ETH_NETWORK : 'ropsten', //homestead or ropsten
+  ETH_TX_EXPLORER_URL : 'https://ropsten.etherscan.io/tx', //homestead or ropsten
+  TX_STATE_FAILED : -1,
+  TX_STATE_PENDING : 0,
+  TX_STATE_CONFIRMED : 1,
+  TX_CONFIRMED_THRESHOLD: 6,
   INFURA_API_KEY: 'qMZ7EIind33NY9Azu836',
   BACKUP: 'Backup',
   RECEIVE: 'Receive',
