@@ -73,7 +73,7 @@ export default class ETHProvider {
     return (tokenAddress == "") ? (await this.sendEther(to, amount)) : (await this.sendToken(to, amount, tokenAddress))
   }
   
-  getTxList(tokenAddress) {
+  async getTxList(tokenAddress) {
     return (tokenAddress == "") ? (await this.getEtherTxList()) : (await this.getTokenTxList(tokenAddress))
   }
 
@@ -122,6 +122,7 @@ export default class ETHProvider {
     // transaction date
     let date = new Date(tx.timeStamp * 1000)
     transaction['date'] = date.toLocaleString()
+    transaction['confirmations'] = tx.confirmations
     // transaction direction
     let receive = (tx.from.toLowerCase() != this.address().toLowerCase())
     transaction['receive'] = receive
