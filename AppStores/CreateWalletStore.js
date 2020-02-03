@@ -1,43 +1,40 @@
-import { observable, action, computed } from 'mobx';
 import MainStore from './MainStore';
-import { generateNew } from './stores/wallet';
 import SecureDS from './datasource/SecureDS';
 import Keystore from '../libs/react-native-golden-keystore';
 import CreateCoinStore from './CreateCoinStore';
+import { ethers } from 'ethers';
+import ETHProvider from '../providers/ETHProvider'
 
 class CreateWalletStore {
-    @observable finished = false
-    @observable loading = false
-  
-    @action async handleCreateWallet() {
+    async handleCreateWallet() {
         this.loading = true
-        const ds = new SecureDS('1111')
-        let indexETH = MainStore.appState.currentWalletIndex
-        let coinPathETH = Keystore.CoinType.ETH.path
-        let indexBTC = MainStore.appState.currentBTCWalletIndex
-        let coinPathBTC = Keystore.CoinType.BTC.path
+        const secureDS = new SecureDS('1111')
+        let pathETH = Keystore.CoinType.ETH.path
+        let pathBTC = Keystore.CoinType.BTC.path
 
-        coinPathETH = coinPathETH.replace('/index', '')
-        coinPathBTC = coinPathBTC.replace('/index', '')
+        pathETH = pathETH.replace('/index', '')
+        pathBTC = pathBTC.replace('/index', '')
 
-        const walletArray = await generateNew(ds, 'wallet', indexETH, indexBTC, coinPathETH, coinPathBTC)
-        const wETH = walletArray[0]
-        const wBTC = walletArray[1]
-        this.finished = true
-        MainStore.appState.appWalletsStore.addOne(wETH)
-        MainStore.appState.setCurrentWalletIndex(indexETH + 1)
-        // MainStore.appState.selectedWallet.fetchingBalance()
-        MainStore.appState.appWalletsStore.addOne(wBTC)
-        MainStore.appState.autoSetSelectedWallet()
-        MainStore.appState.setCurrentBTCWalletIndex(indexBTC + 1)
-        // MainStore.appState.selectedWallet.fetchingBalance()
-
+        const mnemonic = await secureDS.deriveMnemonic()
+        const provider = ethers.getDefaultProvider('mainnet')//production ? 'mainnet' : 'ropsten'
+        const walletETH = ethers.Wallet.fromMnemonic(mnemonic, pathETH).connect(provider)
+        const ethPrivateKey = walletETH.privateKey //test "4E02B37F3CA2F1951C89FF0EC8B0E5585B817333FBC40B8C64D7FED79EB653CE"
+        const walletBTC = ethers.Wallet.fromMnemonic(mnemonic, pathBTC).connect(provider)
+        const btcPrivateKey = walletBTC.privateKey
+      
+        const ethProvider = new ETHProvider(ethPrivateKey)
+        const ethAddress = ethProvider.address()
+        const btcAddress = 'bc1qxjfpe9svhgypa2h4l8pk57rahxw9fcawd3fk7h'
+        
         const createCoinStore = new CreateCoinStore();
-        const coinArray = createCoinStore.handleCreateCoins(wBTC.privateKey, wBTC.address, wETH.privateKey, wETH.address);
+        const coinArray = createCoinStore.handleCreateCoins(btcPrivateKey, btcAddress, ethPrivateKey, ethAddress);
         MainStore.appState.appCoinsStore.addCoins(coinArray)
+        MainStore.appState.btcPrivateKey = btcPrivateKey
+        MainStore.appState.btcAddress = btcAddress
+        MainStore.appState.ethPrivateKey = ethPrivateKey
+        MainStore.appState.ethAddress = ethAddress
         MainStore.appState.save()
-
-        this.loading = false    
+        MainStore.appState.appCoinsStore.getBalances()
     }
   }
   

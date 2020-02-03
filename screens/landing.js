@@ -9,8 +9,8 @@ static navigationOptions = {
 };
 
 async componentWillMount() {
-  const wallets = await MainStore.appState.appWalletsStore.getWalletFromDS();
-  if(wallets.length >= 2){
+  const btcPrivateKey = MainStore.appState.btcPrivateKey
+  if(btcPrivateKey && btcPrivateKey.length >= 0){
     this.props.navigation.navigate('Main')
   }
 }

@@ -6,7 +6,10 @@ import MainStore from '../appstores/MainStore';
 import Tab1 from './tabOne';
 import Tab2 from './tabTwo';
 import Tab3 from './tabthree';
+import { observer, inject } from 'mobx-react'
 
+@inject("appCoinsStore")
+@observer
 export default class CoinDetailReceiveComponent extends Component {
   static navigationOptions = {
     header: null,
@@ -15,29 +18,17 @@ export default class CoinDetailReceiveComponent extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      coins: null,
       selectedCoin: null
     };
   }
 
-  async componentWillMount() {
+  componentWillMount() {
     this.loadCoinData()
   }
-  async loadCoinData(){
-    let coins = await MainStore.appState.appCoinsStore.getCoinFromDS()
+  loadCoinData(){
+    let coins = this.props.appCoinsStore.coins
     coins = coins.filter(c => c.isAdded === true)
-    this.setState({ coins, selectedCoin:coins[0] })
-    try {
-      const response = await fetch('https://api.coinmarketcap.com/v2/ticker/?limit=100&convert=GBP')
-      const posts = await response.json()
-      for(var k in posts.data) {
-        let index = this.getIndexCoin(posts.data[k].symbol)
-        if(index >= 0){
-          coins[index].gbpPrice = posts.data[k].quotes.GBP.price
-          this.setState({ coins })
-        }
-      }
-    } catch (e) { }
+    this.setState({ selectedCoin:coins[0] })
   }
 
   onValueChange(coin){
@@ -48,7 +39,9 @@ export default class CoinDetailReceiveComponent extends Component {
   
   renderPickerItems(){
     const pickerItems = []
-    const {coins} = this.state
+    let coins = this.props.appCoinsStore.coins
+    coins = coins.filter(c => c.isAdded === true)
+    
     if(coins != null){
       coins.forEach(c => {
         const item = <Picker.Item key={c.token_symbol} label={c.token_symbol} value={c} />

@@ -1,55 +1,18 @@
 import React, { Component } from 'react';
 import { StyleSheet, Image, View, ImageBackground, TouchableOpacity, ScrollView } from 'react-native';
 import { Container, Footer, FooterTab, Button, Text, Row, Grid, Col  } from 'native-base';
-import MainStore from '../appstores/MainStore';
+import { observer, inject } from 'mobx-react'
 
+@inject("appCoinsStore")
+@observer
 export default class LandingComponent extends Component {
   static navigationOptions = {
     header: null,
   };
 
-  state = {
-    coins: null,
-    balance: 0
-  }
-
-  async componentWillMount() {
-    this.loadCoinData()
-  }
-  async loadCoinData(){
-    let coins = await MainStore.appState.appCoinsStore.getCoinFromDS()
-    coins = coins.filter(c => c.isAdded === true)
-    let balance = 0
-    coins.forEach(c => {
-      balance = balance + c.gbpPrice * c.balance
-    })
-    this.setState({ coins, balance })
-    try {
-      const response = await fetch('https://api.coinmarketcap.com/v2/ticker/?limit=100&convert=GBP')
-      const posts = await response.json()
-      for(var k in posts.data) {
-        let index = this.getIndexCoin(posts.data[k].symbol)
-        if(index >= 0){
-          coins[index].gbpPrice = posts.data[k].quotes.GBP.price
-          this.setState({ coins })
-        }
-      }
-    } catch (e) { }
-  }
-  
-  getIndexCoin(symbol){
-    const { coins } = this.state
-    let ret = -1
-    coins.forEach((c, index) =>{
-      if(c.token_symbol === symbol){
-        ret = index
-      }
-    })
-    return ret;
-  }
-
   renderList(){
-    let { coins } = this.state
+    let coins = this.props.appCoinsStore.coins
+    coins = coins.filter(c => c.isAdded === true)
 
     let contents = []
     if(coins !== null ) {
@@ -63,11 +26,15 @@ export default class LandingComponent extends Component {
             <Grid style={styles.ListContentBox}>
               <Col style={styles.ListContentLeft}>
                 <Text style={styles.ListContentTop}>{c.token_name}</Text>
-                <Text style={styles.ListContentBottom}>= £ {cost.toFixed(2)}</Text>
+                { cost !== 0 && 
+                  <Text style={styles.ListContentBottom}>= £ {cost.toFixed(2)}</Text>
+                }
               </Col>
               <Col style={styles.ListContentRight}>
-                <Text style={styles.ListRightTop}>{c.gbpPrice.toFixed(4)} GBP</Text>
-                <Text style={styles.ListRightBottom}>{c.balance} {c.token_symbol}</Text>
+                { c.gbpPrice !== 0 && 
+                  <Text style={styles.ListRightTop}>{c.gbpPrice.toFixed(4)} GBP</Text>
+                }
+                <Text style={styles.ListRightBottom}>{c.balance.toFixed(9)} {c.token_symbol}</Text>
               </Col>
             </Grid>
           </Col>
@@ -81,7 +48,13 @@ export default class LandingComponent extends Component {
 
   render() {
     const listContents = this.renderList()
-    const { balance, coins } = this.state
+    let coins = this.props.appCoinsStore.coins
+    coins = coins.filter(c => c.isAdded === true)
+    let balance = 0
+    coins.forEach(c => {
+      balance = balance + c.gbpPrice * c.balance
+    })
+    
     return (
       <Container>
         <ScrollView style={ styles.ScrollViewContainer}>
@@ -115,9 +88,7 @@ export default class LandingComponent extends Component {
                 </ImageBackground>
               </Button>
 
-              <Button style={styles.HomeButton} onPress={() => this.props.navigation.navigate('AddCoinToken', {
-                onGoBack: () => this.loadCoinData(),
-              })}>
+              <Button style={styles.HomeButton} onPress={() => this.props.navigation.navigate('AddCoinToken')}>
                 <ImageBackground source={require('../assets/images/button-bg.png')} style={styles.HomeButtonBackground}>
                   <Text style={styles.HomeButtonText}>ADD COIN</Text>
                 </ImageBackground>

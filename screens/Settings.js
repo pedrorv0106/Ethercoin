@@ -21,10 +21,10 @@ export default class SettingComponent extends Component {
     return (
       <Container>
         <ImageBackground source={require('../assets/images/inner-header-bg.jpg')} style={styles.backgroundImage}>            
-            <TouchableOpacity onPress={() => goBack()}>
-              <Image style={styles.rightbutton} source={require('../assets/images/backbutton.png')} />
-            </TouchableOpacity>
-            <Text style={ styles.PageTitle}>Setting</Text>      
+          <TouchableOpacity onPress={() => goBack()}>
+            <Image style={styles.rightbutton} source={require('../assets/images/backbutton.png')} />
+          </TouchableOpacity>
+          <Text style={ styles.PageTitle}>Setting</Text>      
           <TouchableOpacity onPress={this._onPressButton}/>
         </ImageBackground>
 
@@ -33,13 +33,13 @@ export default class SettingComponent extends Component {
             <TouchableOpacity style={styles.SettingListButton} onPress={() => this.gotoRecoveryPhrase()}>
               <Text style={styles.SettingListText}>Show Recovery Phrase</Text>
               <Icon name="angle-right" type="FontAwesome" style={styles.SettingListArrow}></Icon>
-          </TouchableOpacity>
+            </TouchableOpacity>
           </View>
           <View style={styles.SettingList}>
-          <TouchableOpacity style={styles.SettingListButton} onPress={() => this.props.navigation.navigate('ChangePinOne')}>
+            <TouchableOpacity style={styles.SettingListButton} onPress={() => this.props.navigation.navigate('ChangePinOne')}>
               <Text style={styles.SettingListText}>Change PIN</Text>
               <Icon name="angle-right" type="FontAwesome" style={styles.SettingListArrow}></Icon>
-          </TouchableOpacity>
+            </TouchableOpacity>
           </View>     
         </Content>
       </Container>

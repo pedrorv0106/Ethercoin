@@ -2,7 +2,10 @@ import React, { Component } from 'react';
 import { StyleSheet, Image, View, ImageBackground, TouchableOpacity, ScrollView } from 'react-native';
 import { Container, Footer, FooterTab, Button,  Icon, Grid, Col, Text, Row, Textarea, Picker,Input  } from 'native-base';
 import MainStore from '../appstores/MainStore';
+import { observer, inject } from 'mobx-react'
 
+@inject("appCoinsStore")
+@observer
 export default class CoinDetailSendComponent extends Component {
   static navigationOptions = {
     header: null,
@@ -11,33 +14,24 @@ export default class CoinDetailSendComponent extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      coins: null,
       selectedCoin: null,
       btcValue: '',
-      gbpValue: ''
+      gbpValue: '',
+      toAddress: '0xa7665f62B9991fCE777A9FF4CB67E36820E113e1'
     };
   }
 
-  async componentWillMount() {
+  componentWillMount() {
     this.loadCoinData()
   }
-  async loadCoinData(){
-    let coins = await MainStore.appState.appCoinsStore.getCoinFromDS()
+  loadCoinData(){
+    let coins = this.props.appCoinsStore.coins
     coins = coins.filter(c => c.isAdded === true)
-    this.setState({ coins, selectedCoin:coins[0] })
-    try {
-      const response = await fetch('https://api.coinmarketcap.com/v2/ticker/?limit=100&convert=GBP')
-      const posts = await response.json()
-      for(var k in posts.data) {
-        let index = this.getIndexCoin(posts.data[k].symbol)
-        if(index >= 0){
-          coins[index].gbpPrice = posts.data[k].quotes.GBP.price
-          this.setState({ coins })
-        }
-      }
-    } catch (e) { }
+    this.setState({ selectedCoin:coins[0] })
   }
-
+  onSend(){
+    console.log('onSend')
+  }
   onValueChange(coin){
     this.setState({
       selectedCoin: coin
@@ -46,7 +40,9 @@ export default class CoinDetailSendComponent extends Component {
 
   renderPickerItems(){
     const pickerItems = []
-    const {coins} = this.state
+    let coins = this.props.appCoinsStore.coins
+    coins = coins.filter(c => c.isAdded === true)
+    
     if(coins != null){
       coins.forEach(c => {
         const item = <Picker.Item key={c.token_symbol} label={c.token_symbol} value={c} />
@@ -95,89 +91,95 @@ export default class CoinDetailSendComponent extends Component {
       <Container>
         <ScrollView style={ styles.ScrollViewContainer}>
           <View style={ styles.container }>
-          <ImageBackground source={require('../assets/images/inner-header-bg2.jpg')} style={styles.backgroundImage}>            
-            <View style={styles.HeaderTop}>
-              <TouchableOpacity onPress={() => goBack()}>
-                <Image style={styles.rightbutton} source={require('../assets/images/backbutton.png')} />
-              </TouchableOpacity>
-              <View style={ styles.HeaderPicker}>
-                <Picker
-                  mode="dropdown"
-                  iosHeader="Select Coin"
-                  iosIcon={<Icon name="caret-down" type="FontAwesome" style={styles.DownArrow} />}
-                  style={ styles.PageTitle}
-                  selectedValue={this.state.selectedCoin}
-                  onValueChange={this.onValueChange.bind(this)}
-                  textStyle={{ fontSize:18,color:"#fff" }}
-                  >                
-                  { pickerItems }
-                </Picker> 
+            <ImageBackground source={require('../assets/images/inner-header-bg2.jpg')} style={styles.backgroundImage}>            
+              <View style={styles.HeaderTop}>
+                <TouchableOpacity onPress={() => goBack()}>
+                  <Image style={styles.rightbutton} source={require('../assets/images/backbutton.png')} />
+                </TouchableOpacity>
+                <View style={ styles.HeaderPicker}>
+                  <Picker
+                    mode="dropdown"
+                    iosHeader="Select Coin"
+                    iosIcon={<Icon name="caret-down" type="FontAwesome" style={styles.DownArrow} />}
+                    style={ styles.PageTitle}
+                    selectedValue={this.state.selectedCoin}
+                    onValueChange={this.onValueChange.bind(this)}
+                    textStyle={{ fontSize:18,color:"#fff" }}
+                    >                
+                    { pickerItems }
+                  </Picker> 
+                </View>
+                <TouchableOpacity onPress={() => this.props.navigation.navigate('Settings')}>
+                  <Image style={styles.leftbutton} source={require('../assets/images/icon2.png')} />
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity onPress={() => this.props.navigation.navigate('Settings')}>
-                <Image style={styles.leftbutton} source={require('../assets/images/icon2.png')} />
-              </TouchableOpacity>
-            </View>
-            <View style={styles.HeaderBottom}>
-              <Text style={styles.BalanceTitle}>{balance.toFixed(4)} {symbol}</Text>
-              <View style={styles.BalanceValue}>
-                <Text style={styles.BalanceValueText}> £ {cost.toFixed(2)}</Text>
+              <View style={styles.HeaderBottom}>
+                <Text style={styles.BalanceTitle}>{balance.toFixed(4)} {symbol}</Text>
+                <View style={styles.BalanceValue}>
+                  <Text style={styles.BalanceValueText}> £ {cost.toFixed(2)}</Text>
+                </View>
               </View>
+            </ImageBackground>
+            <View style={styles.BTCContent}>
+              <Grid style={styles.BTCGrid}>
+                <Row style={styles.BTCTextRow}>
+                  <Col>
+                    <Text style={styles.BTCPayText}>Pay to</Text>
+                  </Col>
+                  <Col>
+                    {/* <TouchableOpacity style={styles.BTCTextRight}>
+                      <Text style={styles.BTCLink}>Scan QR Code</Text>
+                    </TouchableOpacity> */}
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <Input 
+                      value = {this.state.toAddress}
+                      onChangeText={(toAddress) => this.setState({toAddress})}
+                      style={styles.BTCTextInput} placeholder="Address" 
+                    />
+                  </Col>          
+                </Row>
+              </Grid>
+              <Grid style={styles.BTCGrid}>
+                <Row style={styles.BTCTextRow}>
+                  <Col><Text style={styles.BTCPayText}>Amount</Text></Col>
+                  <Col>
+                    <TouchableOpacity style={styles.BTCTextRight} onPress={() => this.onUseAllFunds()} >
+                      <Text style={styles.BTCLink}>Use all funds</Text>
+                    </TouchableOpacity>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <Input
+                      value={btcValue}
+                      onChangeText={(btcValue) => this.onChangeAmountField(btcValue)}
+                      keyboardType={'numeric'}
+                      style={styles.BTCTextInput} 
+                      placeholder={symbol} />
+                  </Col>          
+                </Row>
+                <Row>
+                  <Col>
+                    <Input
+                      value={gbpValue}
+                      onChangeText={(gbpValue) => this.onChangeAmountGBPField(gbpValue)}
+                      keyboardType={'numeric'}
+                      style={styles.BTCTextInput} 
+                      placeholder="GBP" />
+                  </Col>          
+                </Row>
+              </Grid>
+              <Grid>
+                <Col>
+                  <Button style={styles.SendButton} onPress={()=>this.onSend()}>
+                    <Text style={styles.SendButtonText}>Send</Text>
+                  </Button>
+                </Col>
+              </Grid>
             </View>
-          </ImageBackground>
-          <View style={styles.BTCContent}>
-            <Grid style={styles.BTCGrid}>
-              <Row style={styles.BTCTextRow}>
-                <Col>
-                  <Text style={styles.BTCPayText}>Pay to</Text>
-                </Col>
-                <Col>
-                  {/* <TouchableOpacity style={styles.BTCTextRight}>
-                    <Text style={styles.BTCLink}>Scan QR Code</Text>
-                  </TouchableOpacity> */}
-                </Col>
-              </Row>
-              <Row>
-                <Col><Textarea style={styles.BTCTextarea} placeholder="Address" /></Col>          
-              </Row>
-            </Grid>
-            <Grid style={styles.BTCGrid}>
-              <Row style={styles.BTCTextRow}>
-                <Col><Text style={styles.BTCPayText}>Amount</Text></Col>
-                <Col>
-                  <TouchableOpacity style={styles.BTCTextRight} onPress={() => this.onUseAllFunds()} >
-                    <Text style={styles.BTCLink}>Use all funds</Text>
-                  </TouchableOpacity>
-                </Col>
-              </Row>
-              <Row>
-                <Col>
-                  <Input
-                    value={btcValue}
-                    onChangeText={(btcValue) => this.onChangeAmountField(btcValue)}
-                    keyboardType={'numeric'}
-                    style={styles.BTCTextInput} 
-                    placeholder={symbol} />
-                </Col>          
-              </Row>
-              <Row>
-                <Col>
-                  <Input
-                    value={gbpValue}
-                    onChangeText={(gbpValue) => this.onChangeAmountGBPField(gbpValue)}
-                    keyboardType={'numeric'}
-                    style={styles.BTCTextInput} 
-                    placeholder="GBP" />
-                </Col>          
-              </Row>
-            </Grid>
-            <Grid>
-            <Col>
-              <Button style={styles.SendButton}>
-                <Text style={styles.SendButtonText}>Send</Text>
-              </Button>
-            </Col>
-          </Grid>
-          </View>
           </View>
         </ScrollView>
         {/* Footer start */}
@@ -237,7 +239,6 @@ const styles = StyleSheet.create({
   BTCTextRow:{ flexDirection: 'row', justifyContent:"space-between", marginBottom:15,  },
   BTCPayText:{ color:"#333333", fontSize:16, },
   BTCLink:{ textAlign:"right", color:"#2c32b2", fontSize:16,  },
-  BTCTextarea:{ backgroundColor:"#fff",  borderRadius:8, elevation: 5, height:50, color:"#757575", fontSize:16, marginBottom:20, paddingTop:15, paddingLeft:20, paddingRight:20,  shadowColor: '#000', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.35, },
   BTCTextInput:{ backgroundColor:"#fff",  borderRadius:8, elevation: 5, height:50, color:"#757575", fontSize:16, marginBottom:20, paddingTop:5, paddingLeft:20, paddingRight:20,  shadowColor: '#000', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.35, },
   BTCGrid:{ marginBottom:15,},
   SendButton:{ width:170, height:60, marginLeft:"auto", marginRight:"auto", marginBottom:50, borderRadius:30, backgroundColor:"#5536aa", borderColor:"#fff", borderWidth:1,   shadowColor: '#000', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.50, },

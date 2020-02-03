@@ -1,14 +1,11 @@
-import { observable, action, computed } from 'mobx'
-import BigNumber from 'bignumber.js'
+import { observable } from 'mobx'
 import { ethers } from 'ethers'
 import erc20ABI from './ERC20.js'
-import Constants from '../../../constants/constant'
+import Constants from '../constants/constant'
 
 export default class ETHProvider {
-
   @observable privateKey = ''
   @observable wallet = null
-
 
   constructor(privateKey) {
     this.privateKey = privateKey

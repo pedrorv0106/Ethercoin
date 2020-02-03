@@ -52,8 +52,8 @@ export default class ChangePinOneComponent extends Component{
         }
         this.setState({pinValue})
     }
-  render() {
-    const {goBack} = this.props.navigation;
+    render() {
+        const {goBack} = this.props.navigation;
         const {pinValue} = this.state
         let pin1 = ''
         let pin2 = ''
@@ -72,17 +72,17 @@ export default class ChangePinOneComponent extends Component{
             pin4 = pinValue.substring(3, 4)
         }
 
-  return (
-    <View style={ styles.container }>
-        <ImageBackground source={require('../assets/images/inner-header-bg.jpg')} style={styles.backgroundImage}>      
-            <TouchableOpacity onPress={() => goBack()}>
-              <Image style={styles.rightbutton} source={require('../assets/images/backbutton.png')} />
-            </TouchableOpacity>      
-            <Text style={ styles.PageTitle}>Enter Old PIN</Text> 
-            <TouchableOpacity>
-            </TouchableOpacity>             
+        return (
+            <View style={ styles.container }>
+                <ImageBackground source={require('../assets/images/inner-header-bg.jpg')} style={styles.backgroundImage}>      
+                    <TouchableOpacity onPress={() => goBack()}>
+                        <Image style={styles.rightbutton} source={require('../assets/images/backbutton.png')} />
+                    </TouchableOpacity>      
+                    <Text style={ styles.PageTitle}>Enter Old PIN</Text> 
+                    <TouchableOpacity>
+                    </TouchableOpacity>             
                 </ImageBackground>                
-        <Grid style={ styles.checkboxcontainer}>
+                <Grid style={ styles.checkboxcontainer}>
                     <Col style={ styles.PasswordInputCol}>
                         <Input value={pin1} secureTextEntry={true} keyboardType={'numeric'} maxLength={1} style={ styles.PasswordInput} />
                     </Col>
@@ -95,10 +95,10 @@ export default class ChangePinOneComponent extends Component{
                     <Col style={ styles.PasswordInputCol}>
                         <Input value={pin4} secureTextEntry={true} keyboardType={'numeric'} maxLength={1} style={ styles.PasswordInput} />
                     </Col>
-        </Grid>
-        <View style={ styles.KeybordMainBox}>
-            <Grid style={ styles.KeybordInnerBox}>
-                <Row>
+                </Grid>
+                <View style={ styles.KeybordMainBox}>
+                    <Grid style={ styles.KeybordInnerBox}>
+                        <Row>
                             <Col style={ styles.KeybordCol}>
                                 <Button style={ styles.KeybordButton} onPress={()=>this.onPressNumericPad(1)}>
                                     <Text style={ styles.KeybordColText}>1</Text>
@@ -114,8 +114,8 @@ export default class ChangePinOneComponent extends Component{
                                     <Text style={ styles.KeybordColText}>3</Text>
                                 </Button>
                             </Col>
-                </Row>
-                <Row>
+                        </Row>
+                        <Row>
                             <Col style={ styles.KeybordCol}>
                                 <Button style={ styles.KeybordButton} onPress={()=>this.onPressNumericPad(4)}>
                                     <Text style={ styles.KeybordColText}>4</Text>
@@ -131,8 +131,8 @@ export default class ChangePinOneComponent extends Component{
                                     <Text style={ styles.KeybordColText}>6</Text>
                                 </Button>
                             </Col>
-                </Row>
-                <Row>
+                        </Row>
+                        <Row>
                             <Col style={ styles.KeybordCol}>
                                 <Button style={ styles.KeybordButton} onPress={()=>this.onPressNumericPad(7)}>
                                     <Text style={ styles.KeybordColText}>7</Text>
@@ -148,8 +148,8 @@ export default class ChangePinOneComponent extends Component{
                                     <Text style={ styles.KeybordColText}>9</Text>
                                 </Button>
                             </Col>
-                </Row>
-                <Row>
+                        </Row>
+                        <Row>
                             <Col style={ styles.KeybordCol}>
                                 <Button style={ styles.KeybordButton}>
                                     <Text style={ styles.KeybordColText}></Text>
@@ -165,10 +165,10 @@ export default class ChangePinOneComponent extends Component{
                                     <Image style={styles.Backbutton} source={require('../assets/images/backicon.png')} />
                                 </Button>
                             </Col>
-                </Row>
-            </Grid>
-        </View>
-    </View>
+                        </Row>
+                    </Grid>
+                </View>
+            </View>
         );
     }
 }

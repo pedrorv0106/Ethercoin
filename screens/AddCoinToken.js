@@ -3,6 +3,10 @@ import { Platform, StyleSheet, Image, View, ImageBackground, TouchableOpacity, S
 import { Container, Footer, FooterTab, Button, Text, Row, Grid, Col, Input, CheckBox  } from 'native-base';
 import MainStore from '../appstores/MainStore';
 
+import { observer, inject } from 'mobx-react'
+
+@inject("appCoinsStore")
+@observer
 export default class AddCoinTokenComponent extends Component {
   static navigationOptions = {
     header: null,
@@ -13,7 +17,7 @@ export default class AddCoinTokenComponent extends Component {
     coinsSearched: null
   }
   async componentWillMount() {
-    const coins = await MainStore.appState.appCoinsStore.getCoinFromDS()
+    let coins = this.props.appCoinsStore.coins
     this.setState({ coins, coinsSearched: coins })
   }
 
@@ -70,7 +74,6 @@ export default class AddCoinTokenComponent extends Component {
     return contents
   }
   goback(){
-    this.props.navigation.state.params.onGoBack();
     this.props.navigation.goBack();
   }
 

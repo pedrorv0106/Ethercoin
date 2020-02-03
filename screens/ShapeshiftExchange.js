@@ -3,7 +3,10 @@ import { StyleSheet, Text, View, ImageBackground, TouchableOpacity, ScrollView, 
 import { Container, Footer, FooterTab, Grid, Col, Icon, Row, Input, Button } from 'native-base';
 import MainStore from '../appstores/MainStore';
 import * as changelly from '../api/changelly'
+import { observer, inject } from 'mobx-react'
 
+@inject("appCoinsStore")
+@observer
 export default class ShapeshiftExchangeComponent extends Component {
     static navigationOptions = {
         header: null,
@@ -11,7 +14,6 @@ export default class ShapeshiftExchangeComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            coins: null,
             isDropdownExchange: false,
             exchangeCoin: null,
             isDropdownReceive: false,
@@ -21,12 +23,12 @@ export default class ShapeshiftExchangeComponent extends Component {
         }
     }
 
-    async componentWillMount() {
+    componentWillMount() {
         this.loadCoinData()
     }
 
-    async loadCoinData(){
-        let coins = await MainStore.appState.appCoinsStore.getCoinFromDS()
+    loadCoinData(){
+        let coins = this.props.appCoinsStore.coins
         coins = coins.filter(c => c.isAdded === true)
         let exchangeCoin = null
         let receiveCoin = null
@@ -36,7 +38,7 @@ export default class ShapeshiftExchangeComponent extends Component {
         if(coins != null && coins.length > 1){
             receiveCoin = coins[1]
         }
-        this.setState({ coins, exchangeCoin, receiveCoin })
+        this.setState({ exchangeCoin, receiveCoin })
     }
 
     onNext(){
@@ -118,7 +120,9 @@ export default class ShapeshiftExchangeComponent extends Component {
         return ret
     }
     renderDropdownExchange(){
-        let {coins} = this.state
+        let coins = this.props.appCoinsStore.coins
+        coins = coins.filter(c => c.isAdded === true)
+
         let contents =[]
         if(coins){
             coins.forEach(c => {
@@ -139,7 +143,9 @@ export default class ShapeshiftExchangeComponent extends Component {
         return contents
     }
     renderDropdownReceive(){
-        let {coins} = this.state
+        let coins = this.props.appCoinsStore.coins
+        coins = coins.filter(c => c.isAdded === true)
+        
         let contents =[]
         if(coins){
             coins.forEach(c => {
