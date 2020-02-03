@@ -12,6 +12,7 @@ class AppState {
     @observable ethAddress = ''
     @observable btcPrivateKey = ''
     @observable btcAddress = ''
+    @observable mnemonic = ''
   
     lastestVersionRead = ''
     shouldShowUpdatePopup = true
@@ -36,6 +37,10 @@ class AppState {
       this.pinCode = code
       this.save()
     }
+    @action setMnemonic(mnemonic){
+      this.mnemonic = mnemonic
+      this.save()
+    }
   
     @action async import(orgData) {
       const data = orgData
@@ -48,6 +53,7 @@ class AppState {
       this.ethPrivateKey = data.ethPrivateKey
       this.btcAddress = data.btcAddress
       this.btcPrivateKey = data.btcPrivateKey
+      this.mnemonic = data.mnemonic
   
       await this.appCoinsStore.getCoinFromDS()
       this.appCoinsStore.getBalances()
@@ -77,7 +83,8 @@ class AppState {
         ethAddress: this.ethAddress,
         ethPrivateKey: this.ethPrivateKey,
         btcAddress: this.btcAddress,
-        btcPrivateKey: this.btcPrivateKey
+        btcPrivateKey: this.btcPrivateKey,
+        mnemonic: this.mnemonic
       }
     }
   }

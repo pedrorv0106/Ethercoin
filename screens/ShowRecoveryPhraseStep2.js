@@ -16,6 +16,7 @@ export default class ShowRecoveryPhraseStepTwoComponent extends Component {
     const mnemonic = mnemonicString.split(' ').map(String)
     console.log('aaaaa', mnemonic)
     this.setState({mnemonic})
+    // MainStore.appState.setMnemonic(mnemonicString)
   }
   render() {
     const {goBack} = this.props.navigation;
