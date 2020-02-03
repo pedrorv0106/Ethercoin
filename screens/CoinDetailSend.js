@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Image, View, ImageBackground, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, Image, View, ImageBackground, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { Container, Footer, FooterTab, Button,  Icon, Grid, Col, Text, Row, Textarea, Picker,Input  } from 'native-base';
 import MainStore from '../appstores/MainStore';
 import { observer, inject } from 'mobx-react'
@@ -17,7 +17,7 @@ export default class CoinDetailSendComponent extends Component {
       selectedCoin: null,
       btcValue: '',
       gbpValue: '',
-      toAddress: '0xa7665f62B9991fCE777A9FF4CB67E36820E113e1'
+      toAddress: '0x0e1012F7720B20adAB861F70E09f1a82f99aCA57'
     };
   }
 
@@ -29,8 +29,27 @@ export default class CoinDetailSendComponent extends Component {
     coins = coins.filter(c => c.isAdded === true)
     this.setState({ selectedCoin:coins[0] })
   }
-  onSend(){
-    console.log('onSend')
+  async onSend(){
+    const {selectedCoin, btcValue, gbpValue, toAddress} = this.state
+    if(selectedCoin.wallet_symbol === 'ETH'){
+      let token_contract_address = selectedCoin.token_contract_address
+      if(selectedCoin.token_symbol === 'ETH'){
+        token_contract_address = ''
+      }
+      console.log('onSend', selectedCoin, toAddress, btcValue, token_contract_address)
+      let transaction = await MainStore.appState.appCoinsStore.ethProvider.send(toAddress, btcValue, token_contract_address)
+      console.log('transaction', transaction)
+      Alert.alert(
+        'Success',
+        'Sent.',
+        [
+            {text: 'OK', onPress: () => { } },
+        ],
+        { cancelable: true }
+    );
+    } else {
+
+    }
   }
   onValueChange(coin){
     this.setState({

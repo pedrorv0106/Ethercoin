@@ -40,7 +40,10 @@ export default class AppCoinsStore {
   @action async getBalances(){
     if(!this.ethProvider){
       console.log('Ethereum Address: ', MainStore.appState.ethAddress)
-      this.ethProvider = new ETHProvider(MainStore.appState.ethPrivateKey)
+      let ethPrivateKey = MainStore.appState.ethPrivateKey
+      ethPrivateKey = ethPrivateKey.replace('0x', '')
+      console.log('Ethereum Private Key: ', ethPrivateKey)
+      this.ethProvider = new ETHProvider(ethPrivateKey)
     }
     try {
       const response = await fetch(Constant.COINMARKET_GET_GBP_URL)
