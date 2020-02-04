@@ -27,6 +27,6 @@ export default {
   CHANGELLY_SECRET: '38895a3ceaa02f0beeb66ced3b0b237d2487ad4f102aa4160dbb1ec71114b827',
   CHANGELLY_URL: 'http://api.changelly.com',
   COINMARKET_GET_GBP_URL: 'https://api.coinmarketcap.com/v2/ticker/?limit=100&convert=GBP',
-  INTERVAL_GET_GBP: 10000
+  INTERVAL_GET_GBP: 60000
 
 }
