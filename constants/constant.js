@@ -1,13 +1,13 @@
 export default {
-  BTC_NETWORK : 'testnet',  // livenet or testnet
+  BTC_NETWORK : 'mainnet',  // livenet or testnet
   ETH_NETWORK : 'ropsten', //homestead or ropsten
   ETH_TX_EXPLORER_URL : 'https://ropsten.etherscan.io/tx', //homestead or ropsten
   TX_STATE_FAILED : -1,
   TX_STATE_PENDING : 0,
   TX_STATE_CONFIRMED : 1,
   TX_CONFIRMED_THRESHOLD: 6,
-  BTC_TX_EXPLORER_URL: "https://testnet.blockexplorer.com/tx/",
-  BTC_API_URL: "https://testnet.blockexplorer.com/api",
+  BTC_TX_EXPLORER_URL: "https://explorer.bitcoin.com/btc/tx/",
+  BTC_API_URL: "https://explorer.bitcoin.com/api/btc/",
   TX_HISTORY_LIMIT: 100,
   SIMPLEX_QUOTE_URL: 'https://sandbox.test-simplexcc.com/wallet/merchant/v2/quote',
   SIMPLEX_API_KEY: '0355341ae024a347b804f0d4a3c620d6',
