@@ -17,7 +17,7 @@ export default class CoinDetailSendComponent extends Component {
       selectedCoin: null,
       btcValue: '',
       gbpValue: '',
-      toAddress: '16KbsDgbpNnaE8Yi3kjMy8SbzgFHHLnRjz'//'0x0e1012F7720B20adAB861F70E09f1a82f99aCA57' //'16KbsDgbpNnaE8Yi3kjMy8SbzgFHHLnRjz'
+      toAddress: ''
     };
   }
 
