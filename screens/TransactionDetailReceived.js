@@ -44,8 +44,8 @@ export default class TransactionDetailReceivedComponent extends Component {
             <Text style={ styles.TarmsText}><Text style={ styles.TarmsTextLink}>Received From</Text> {"\n"} {transaction.amount} {selectedCoin.token_symbol} {cost.toFixed(2)} £ {transaction.from}</Text>
             <Text style={ styles.TarmsText}>Transction id {transaction.hash}</Text>
           </View>
-          <View style={ styles.Buttoncontainer } onPress={()=> this.openURL()}>
-            <TouchableOpacity style={ styles.TarmsButton}>
+          <View style={ styles.Buttoncontainer }>
+            <TouchableOpacity style={ styles.TarmsButton} onPress={()=> this.openURL()}>
               <Text style={ styles.TarmsButtonText}>View on Blockchain Explorer</Text>
             </TouchableOpacity>
           </View>

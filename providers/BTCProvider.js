@@ -355,6 +355,6 @@ export default class BTCProvider {
   }
 
   getTxUrl(txId) {
-    return (Constants.BTC_TX_EXPLORER_URL + "/" + txId);
+    return (Constants.BTC_TX_EXPLORER_URL + txId);
   }
 }
