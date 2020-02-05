@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, ImageBackground, Image, TouchableOpacity, ScrollView} from 'react-native';
 import { Text, CheckBox, } from 'native-base';
-import SecureDS from '../appstores/datasource/SecureDS';
+import { ethers } from 'ethers'
 
 export default class RecoveryStepOneComponent extends Component {
     static navigationOptions = {
@@ -12,9 +12,9 @@ export default class RecoveryStepOneComponent extends Component {
         mnemonicString: '',
     }
     async componentWillMount() {
-        const mnemonicString = await new SecureDS('1111').deriveMnemonic();
+        let mnemonicString = ethers.utils.HDNode.entropyToMnemonic(ethers.utils.randomBytes(16))
         let mnemonic = mnemonicString.split(' ')
-        this.setState({ mnemonic, mnemonicString  })
+        this.setState({ mnemonic, mnemonicString })
     }
 
     render() {

@@ -1,11 +1,16 @@
 
-import { observable} from 'mobx'
+import { observable, has} from 'mobx'
 import * as bitcoin from 'bitcoinjs-lib'
 import * as bip39 from 'bip39'
 import qs from 'qs'
-import bitcoinTransaction from 'bitcoin-transaction'
 import Constants from '../constants/constant'
 import { BigNumber}  from 'bignumber.js'
+import axios from 'axios'
+
+let coinSelect = require('coinselect')
+
+var BITCOIN_DIGITS = 8;
+var BITCOIN_SAT_MULT = Math.pow(10, BITCOIN_DIGITS);
 
 export default class BTCProvider {
 
@@ -36,37 +41,68 @@ export default class BTCProvider {
   }
 
   async getBalance() {
-    let balance = await bitcoinTransaction.getBalance(this.address, { network: Constants.BTC_NETWORK })
-    return Number(balance)
+    const url = Constants.BTC_API_URL + "addr/" + this.address + "/balance"
+    const response = await axios.get(url)  
+    return response.data/BITCOIN_SAT_MULT
   }
 
   async send(to, amount) {
-    return await bitcoinTransaction.sendTransaction({
-      from: this.address,
-      to: to,
-      privKeyWIF: this.privateKey,
-      btc: amount,
-      network: Constants.BTC_NETWORK
-    })
+    // console.log('BTC Private Key: ', this.privateKey)
+    const targets = [{
+      address: to,
+      value: (new BigNumber(amount)).times(Constants.BTC_TO_SATOSHI).toNumber(),
+    }];
+    var ret;
+    try {
+      ret = await this.buildTransaction({
+        targets,
+        feeRate: Constants.DEFAULT_FEE_STATE_PER_BYTE,
+        includeUnconfirmedFunds: false,
+      });
+    } catch(e) {
+      console.log("build error");
+    }
+    // console.log('buildTransaction Result', ret)
+    if (!ret) {
+      return;
+    }
+
+    var finalTx;
+    try {
+      finalTx = await this.signTx({
+        txBuilder: ret.txBuilder,
+        inputValues: ret.inputValues
+      });
+    } catch(e) {
+      console.log("key error");
+      return;
+    }
+    // console.log('sign result:', finalTx)
+
+    const hash = finalTx.toHex();
+
+    const res = await this.pushTx(hash);
+
+    return res.data
   }
+
   async getTxList() {
     let txs
     try {
-      txs = await this.getTxs("", "", this.address)
+      const url = Constants.BTC_API_URL + "txs/?address=" + this.address
+      console.log(url)
+      const response = await axios.get(url)  
+      txs = response.data.txs
     } catch (e) {
       return []
     }
     if (!txs) {
       return []
     }
-    var items = txs['items'];
-    if (!items) {
-      return []
-    }
-
+    
     var count = 0
     let newList = []
-    for (let item of items) {
+    for (let item of txs) {
       var txData = this.makeTxData(item);
       if (!txData) {
         continue
@@ -80,19 +116,116 @@ export default class BTCProvider {
     return newList
   }
 
-  getTxs(from, to, addrs) {
+  async buildTransaction(option) {
+    const { targets, feeRate, includeUnconfirmedFunds } = option;
+    
+    const txb = new bitcoin.TransactionBuilder(this.network);
+    txb.setVersion(1);
+    let res = await this.getUtxos([this.address], includeUnconfirmedFunds);
+    // console.log('getUtxos Result:', res)
+    if (!res) {
+      console.log("Invalid address");
+      return null;
+    }
+    let { inputs, outputs, fee } = coinSelect(res.utxos, targets, feeRate)
+    
+    if (!inputs || !outputs) {
+      console.log("Insufficient balance because fee is variable");
+      return null;
+    }
+
+    const inputValues = [];
+    inputs.forEach(input => {
+      txb.addInput(input.txId, input.vout);
+      inputValues.push(input.value); // for BCH
+    })
+
+    outputs.forEach(output => {
+      if (!output.address) {
+        output.address = this.getAddress();
+      }
+      txb.addOutput(output.address, output.value)
+    })
+    
+    return {
+      txBuilder: txb,
+      fee: (new BigNumber(fee)).div(Constants.BTC_TO_SATOSHI),
+      inputValues: inputValues,
+    };
+  }
+
+  async getUtxos(addressList, includeUnconfirmedFunds = false, fallback = true){
+    let v = await this.getUtxosRaw(addressList, fallback);
+    if (!v) {
+      return null;
+    }
+
+    const utxos = [];
+    let bal = new BigNumber(0);
+    let unconfirmed = new BigNumber(0);
+
+    for(let i = 0; i < v.length; i++){
+      bal = bal.plus(v[i].amount);
+      const u = v[i];
+      if (includeUnconfirmedFunds || u.confirmations){
+        utxos.push({
+          value: (new BigNumber(u.amount)).times(Constants.BTC_TO_SATOSHI).toNumber(),
+          txId: u.txid,
+          vout: u.vout,
+          address: u.address,
+          confirmations: u.confirmations
+        })
+      }else{
+        unconfirmed = unconfirmed.plus(u.amount)
+      }
+    }
+    return {
+      balance: bal.toNumber(),
+      utxos,
+      unconfirmed: unconfirmed.toNumber()
+    }
+  }
+
+  getUtxosRaw(addressList, fallback = true, cnt = 0) {
     return axios({
-        url: Constants.BTC_API_URL + "/addrs/txs",
+      url: Constants.BTC_API_URL + "addrs/" + addressList.join(",") + "/utxo",
+      method: "GET"
+    }).then(res => res.data);
+  }
+
+  signTx(option){
+    const { txBuilder, inputValues } = option;
+
+    for(let i = 0; i < inputValues.length; i++){
+        txBuilder.sign(i, bitcoin.ECPair.fromWIF(this.privateKey, this.network))
+    }
+    return txBuilder.build()
+  }
+
+  pushTx(hex) {
+    return axios({
+        url: Constants.BTC_API_URL + "tx/send",
         data: qs.stringify({
-            noAsm: 1,
-            noScriptSig: 1,
-            noSpent: 0,
-            from,
-            to,
-            addrs: addrs.join(',')
+            rawtx: hex
         }),
         method: "POST"
-    }).then(res => res.data);
+    }).then(res => {
+        return {
+            status: res.status,
+            data: res.data
+        };
+    }).catch(function (error) {
+        console.log('pushTx API call error:', error);
+        const res = error.response;
+        if (res) {
+            return {
+                status: res.status,
+                data: res.data
+            }
+        } else {
+            return null;
+        }
+    })
   }
 
   makeTxData(tx) {
@@ -105,10 +238,9 @@ export default class BTCProvider {
     }
     let timestamp = new BigNumber(time).multipliedBy(1000);
     let date = new Date(timestamp.toNumber());
-    txData['txDate'] = date.toLocaleString();
-    txData['timeStamp'] = timestamp.toNumber();
-    txData['txIdx'] = txData['timeStamp'];
-
+    txData['date'] = date.toLocaleString();
+    txData['timestamp'] = timestamp.toNumber();
+    
     const trader = this.parseTx(tx);
     if (!trader) {
       // console.log("Failed to get the sender and receiver from tx data");
@@ -118,7 +250,7 @@ export default class BTCProvider {
 
     txData['from'] = sender;
     txData['to'] = receiver;
-    txData['txReceive'] = receive;
+    txData['receive'] = receive;
 
     // transaction state
     let state = Constants.TX_STATE_CONFIRMED;
@@ -131,27 +263,28 @@ export default class BTCProvider {
         desc = "Pending";
       }
     }
-    txData['txState'] = state;
+    txData['confirmations'] = confirmations
+    txData['state'] = state;
 
     // transaction description
-    txData['txDescStr'] = desc.toUpperCase();
+    txData['descStr'] = desc.toUpperCase();
     
     if (receive) {
       desc = desc + " Receive";
     } else {
       desc = desc + " Transfer";
     }
-    txData['txDesc'] = desc;
+    txData['desc'] = desc;
 
     // transaction amount
-    txData['txAmount'] = amount;
+    txData['amount'] = amount;
 
     // transaction fee
-    txData['txFee'] = tx['fees'];
+    txData['fee'] = tx['fees'];
 
     // transaction url
-    txData['txUrl'] = this.getTxUrl(tx['txid']);
-
+    txData['url'] = this.getTxUrl(tx['txid']);
+    txData['hash'] = tx['txid']
     txData['showDetail'] = false;
 
     return txData;

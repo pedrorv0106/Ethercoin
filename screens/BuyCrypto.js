@@ -2,7 +2,10 @@ import React, { Component } from 'react';
 import { Platform, StyleSheet, Image, View, ImageBackground, TouchableOpacity, ScrollView } from 'react-native';
 import { Container, Footer, FooterTab, Button, Text, Row, Grid, Col, Input,  Icon, Picker  } from 'native-base';
 import fiatCurrency from '../constants/fiatCurrency'
+import { observer, inject } from 'mobx-react'
 
+@inject("appCoinsStore")
+@observer
 export default class BuyCryptoComponent extends Component {
   static navigationOptions = {
       header: null,
@@ -94,6 +97,12 @@ export default class BuyCryptoComponent extends Component {
     const fiatPickerItems = this.renderFiatCurrencyPickerItems()
     const coinPikcerItems = this.renderCoinPickerItems()
     const costSelectedWallet = selectedWallet.balance * selectedWallet.gbpPrice
+    let address = ''
+    if(selectedWallet.wallet_symbol === 'BTC'){
+      address = this.props.appCoinsStore.btcProvider.getAddress()
+    } else {
+      address = this.props.appCoinsStore.ethProvider.address()
+    }
 
     return (
       <Container>
@@ -119,7 +128,7 @@ export default class BuyCryptoComponent extends Component {
                 <Col style={ styles.WalletCol}>
                   <Image style={styles.WalletIcon} source={selectedWallet.icon_path} />
                   <Text style={styles.WalletTitle}>My Wallet</Text>
-                  <Text style={styles.WalletDetail}>{selectedWallet.wallet_address}</Text>
+                  <Text style={styles.WalletDetail}>{address}</Text>
                   <Text style={styles.WalletAmount}>£ {costSelectedWallet.toFixed(2)}</Text>
                     <TouchableOpacity style={styles.WalletButton} 
                       onPress={() => {

@@ -4,8 +4,6 @@ const defaultObjCoin = {
   token_name: '',
   token_symbol: '',
   wallet_symbol: '',
-  wallet_privatekey: '',
-  wallet_address: '',
   token_contract_address: '',
   decimals: 0,
   balance: 0,
@@ -18,8 +16,6 @@ export default class Coin {
   @observable token_name = ''
   @observable token_symbol = ''
   @observable wallet_symbol = ''
-  @observable wallet_privatekey = ''
-  @observable wallet_address = ''
   @observable token_contract_address = ''
   @observable decimals = 0
   @observable balance = 0
@@ -42,16 +38,13 @@ export default class Coin {
 
   toJSON() {
     const {
-      token_name, token_symbol, wallet_symbol, wallet_privatekey,
-      wallet_address, token_contract_address, decimals, balance, gbpPrice,
+      token_name, token_symbol, wallet_symbol, token_contract_address, decimals, balance, gbpPrice,
       isAdded, icon_path
     } = this
     return {
       token_name,
       token_symbol,
       wallet_symbol,
-      wallet_privatekey,
-      wallet_address,
       token_contract_address,
       decimals,
       balance,

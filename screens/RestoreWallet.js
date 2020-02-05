@@ -1,8 +1,7 @@
 import React, {Component} from 'react';
-import { Platform, StyleSheet, View, ImageBackground, TouchableOpacity, Image, ScrollView, Alert } from 'react-native';
+import { StyleSheet, View, ImageBackground, TouchableOpacity, Image, ScrollView, Alert } from 'react-native';
 import { Input, Text } from 'native-base';
-import MainStore from '../appstores/MainStore';
-import CreateWalletStore from '../appstores/CreateWalletStore';
+import CreateCoinStore from '../appstores/CreateCoinStore';
 
 export default class RestoreWalletComponent extends Component {
   static navigationOptions = {
@@ -53,8 +52,8 @@ export default class RestoreWalletComponent extends Component {
       );
     } else {
       const mnemonic = `${passphraseInputValue1} ${passphraseInputValue2} ${passphraseInputValue3} ${passphraseInputValue4} ${passphraseInputValue5} ${passphraseInputValue6} ${passphraseInputValue7} ${passphraseInputValue8} ${passphraseInputValue9} ${passphraseInputValue10} ${passphraseInputValue11} ${passphraseInputValue12}`;
-      const createWalletStore = new CreateWalletStore();
-      await createWalletStore.handleRestoreWallet(mnemonic);
+      const createCoinStore = new CreateCoinStore();
+      await createCoinStore.handleRestoreWallet(mnemonic);
 
       this.props.navigation.navigate('Main')
     }

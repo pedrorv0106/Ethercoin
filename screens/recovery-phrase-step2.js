@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import { StyleSheet, View, ImageBackground, Alert, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { Input, Text } from 'native-base';
-import CreateWalletStore from '../appstores/CreateWalletStore';
+import CreateCoinStore from '../appstores/CreateCoinStore';
 import shuffle from 'lodash.shuffle'
 
 export default class RecoveryStepTwoComponent extends Component {
@@ -32,8 +32,8 @@ export default class RecoveryStepTwoComponent extends Component {
       && passphraseInputValue2 === listKeywordRandom[1]
       && passphraseInputValue3 === listKeywordRandom[2]
       && passphraseInputValue4 === listKeywordRandom[3]) {        
-        const createWalletStore = new CreateWalletStore();
-        await createWalletStore.handleRestoreWallet(this.state.mnemonicString);
+        const createCoinStore = new CreateCoinStore();
+        await createCoinStore.handleRestoreWallet(this.state.mnemonicString);
 
         this.props.navigation.navigate('Main')
     } else {

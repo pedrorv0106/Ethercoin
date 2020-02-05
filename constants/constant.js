@@ -8,6 +8,8 @@ export default {
   TX_CONFIRMED_THRESHOLD: 6,
   BTC_TX_EXPLORER_URL: "https://explorer.bitcoin.com/btc/tx/",
   BTC_API_URL: "https://explorer.bitcoin.com/api/btc/",
+  BTC_TO_SATOSHI: 100000000,
+  DEFAULT_FEE_STATE_PER_BYTE: 2,
   TX_HISTORY_LIMIT: 100,
   SIMPLEX_QUOTE_URL: 'https://sandbox.test-simplexcc.com/wallet/merchant/v2/quote',
   SIMPLEX_API_KEY: '0355341ae024a347b804f0d4a3c620d6',

@@ -9,8 +9,8 @@ static navigationOptions = {
 };
 
 async componentWillMount() {
-  const btcPrivateKey = MainStore.appState.btcPrivateKey
-  if(btcPrivateKey && btcPrivateKey.length >= 0){
+  const mnemonic = MainStore.appState.mnemonic
+  if(mnemonic && mnemonic.length >= 0){
     this.props.navigation.navigate('Main')
   }
 }

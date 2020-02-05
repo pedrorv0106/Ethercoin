@@ -17,7 +17,7 @@ export default class CoinDetailSendComponent extends Component {
       selectedCoin: null,
       btcValue: '',
       gbpValue: '',
-      toAddress: '0x0e1012F7720B20adAB861F70E09f1a82f99aCA57'
+      toAddress: ''//'0x0e1012F7720B20adAB861F70E09f1a82f99aCA57'
     };
   }
 
@@ -31,14 +31,21 @@ export default class CoinDetailSendComponent extends Component {
   }
   async onSend(){
     const {selectedCoin, btcValue, gbpValue, toAddress} = this.state
+    let transaction
     if(selectedCoin.wallet_symbol === 'ETH'){
       let token_contract_address = selectedCoin.token_contract_address
       if(selectedCoin.token_symbol === 'ETH'){
         token_contract_address = ''
       }
       console.log('onSend', selectedCoin, toAddress, btcValue, token_contract_address)
-      let transaction = await MainStore.appState.appCoinsStore.ethProvider.send(toAddress, btcValue, token_contract_address)
+      transaction = await MainStore.appState.appCoinsStore.ethProvider.send(toAddress, btcValue, token_contract_address)
       console.log('transaction', transaction)
+    } else {
+      console.log('onSend', selectedCoin, toAddress, btcValue)
+      transaction = await MainStore.appState.appCoinsStore.btcProvider.send(toAddress, btcValue)
+      console.log('transaction', transaction)      
+    }
+    if(transaction){
       Alert.alert(
         'Success',
         'Sent.',
@@ -46,9 +53,16 @@ export default class CoinDetailSendComponent extends Component {
             {text: 'OK', onPress: () => { } },
         ],
         { cancelable: true }
-    );
+      );
     } else {
-
+      Alert.alert(
+        'Error',
+        'Sending is Failed.',
+        [
+            {text: 'OK', onPress: () => { } },
+        ],
+        { cancelable: true }
+      );
     }
   }
   onValueChange(coin){

@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Platform, StyleSheet, Image, View, ImageBackground, TouchableOpacity, ScrollView } from 'react-native';
 import { Container, Footer, FooterTab, Button,  Icon, Grid, Col, Text, Row, Tabs, Tab,  TabHeading, Picker  } from 'native-base';
-import MainStore from '../appstores/MainStore';
 
 import Tab1 from './tabOne';
 import Tab2 from './tabTwo';
@@ -63,7 +62,11 @@ export default class CoinDetailReceiveComponent extends Component {
       cost = selectedCoin.gbpPrice * selectedCoin.balance;
       balance = selectedCoin.balance
       symbol = selectedCoin.token_symbol
-      address = selectedCoin.wallet_address
+      if(selectedCoin.wallet_symbol === 'BTC'){
+        address = this.props.appCoinsStore.btcProvider.getAddress()
+      } else {
+        address = this.props.appCoinsStore.ethProvider.address()
+      }
     }
 
     return (

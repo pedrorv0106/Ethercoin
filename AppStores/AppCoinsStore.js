@@ -3,10 +3,12 @@ import CoinDS from './datasource/CoinDS'
 import Constant from '../constants/constant'
 import ETHProvider from '../providers/ETHProvider'
 import MainStore from './MainStore'
+import BTCProvider from '../providers/BTCProvider'
 
 export default class AppCoinsStore {
   @observable coins = []
   @observable ethProvider
+  @observable btcProvider
 
   @action async getCoinFromDS() {
     const coins = await CoinDS.getCoins()
@@ -39,12 +41,16 @@ export default class AppCoinsStore {
 
   @action async getBalances(){
     if(!this.ethProvider){
-      console.log('Ethereum Address: ', MainStore.appState.ethAddress)
-      let ethPrivateKey = MainStore.appState.ethPrivateKey
-      ethPrivateKey = ethPrivateKey.replace('0x', '')
-      console.log('Mnemonic: ', MainStore.appState.mnemonic, ethPrivateKey)
+      console.log('Mnemonic: ', MainStore.appState.mnemonic)
       this.ethProvider = new ETHProvider(MainStore.appState.mnemonic)
+      console.log('Ethereum Address: ', this.ethProvider.address())
     }
+    if(!this.btcProvider){
+      this.btcProvider = new BTCProvider(MainStore.appState.mnemonic)
+      await this.btcProvider.loadWalletFromMnemonic()
+      console.log('BTC Address: ', this.btcProvider.getAddress())
+    }
+    
     try {
       const response = await fetch(Constant.COINMARKET_GET_GBP_URL)
       const posts = await response.json()
@@ -58,7 +64,9 @@ export default class AppCoinsStore {
       console.log('Getting GBP Price is failed')
     }
     
-    this.coins.forEach((coin, index) => this.getBalance(coin, index))
+    this.coins.forEach(async (coin, index) => {
+      await this.getBalance(coin, index)
+    })
     
     setTimeout(() =>{
       this.getBalances()
@@ -74,12 +82,13 @@ export default class AppCoinsStore {
     return ret;
   }
   async getBalance(coin, index){
+    let balance = 0
     if(coin.wallet_symbol === 'BTC'){
-
+      balance = await this.btcProvider.getBalance()
     } else {
-      let balance = await this.ethProvider.getBalance(coin.token_contract_address)
-      this.coins[index].balance = balance
-      console.log('balance:', this.coins[index].token_symbol, balance)
+      balance = await this.ethProvider.getBalance(coin.token_contract_address)
     }
+    this.coins[index].balance = balance
+    console.log('balance:', this.coins[index].token_symbol, balance)
   }
 }

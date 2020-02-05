@@ -8,10 +8,6 @@ class AppState {
     @observable internetConnection = 'online' // online || offline
     @observable allowDailyUsage = null
     @observable pinCode = ''
-    @observable ethPrivateKey = ''
-    @observable ethAddress = ''
-    @observable btcPrivateKey = ''
-    @observable btcAddress = ''
     @observable mnemonic = ''
   
     lastestVersionRead = ''
@@ -49,10 +45,6 @@ class AppState {
       this.lastestVersionRead = data.lastestVersionRead
       this.allowDailyUsage = data.allowDailyUsage
       this.pinCode = data.pinCode
-      this.ethAddress = data.ethAddress
-      this.ethPrivateKey = data.ethPrivateKey
-      this.btcAddress = data.btcAddress
-      this.btcPrivateKey = data.btcPrivateKey
       this.mnemonic = data.mnemonic
   
       await this.appCoinsStore.getCoinFromDS()
@@ -80,10 +72,6 @@ class AppState {
         shouldShowUpdatePopup: this.shouldShowUpdatePopup,
         allowDailyUsage: this.allowDailyUsage,
         pinCode: this.pinCode,
-        ethAddress: this.ethAddress,
-        ethPrivateKey: this.ethPrivateKey,
-        btcAddress: this.btcAddress,
-        btcPrivateKey: this.btcPrivateKey,
         mnemonic: this.mnemonic
       }
     }
